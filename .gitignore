@@ -1,0 +1,20 @@
+/build/
+/.settings/
+/.gradle/
+/bin/
+/gradle/
+/gradlew
+/gradlew.bat
+/.classpath
+/.project
+/target/
+
+# Editors, etc
+*.DS_Store*
+.idea
+.vscode
+*.swp
+.project
+.pydevproject
+.settings/
+
