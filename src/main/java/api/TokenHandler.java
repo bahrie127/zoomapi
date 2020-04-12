@@ -29,22 +29,6 @@ public class TokenHandler {
 
     private String code;
 
-    protected void doGet(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
-            throws ServletException, IOException, OAuthProblemException {
-
-
-        /*OAuthClientRequest request;
-
-        // ... omitted code ...
-
-        servletResponse.sendRedirect(request.getLocationUri());*/
-
-        OAuthAuthzResponse oar = OAuthAuthzResponse.oauthCodeAuthzResponse(servletRequest);
-        String code = oar.getCode();
-        System.out.println("Code: " + code);
-
-    }
-
     /**
      * Opens a HTTP receiver to obtain the authorization code required for the token
      * also sends back a blank content response to client browser
@@ -92,6 +76,7 @@ public class TokenHandler {
                 .setRedirectURI(redirectUri)
                 .buildQueryMessage();
 
+        System.out.println("Location uri: " + authorizationCodeRequest.getLocationUri());
         this.httpReceiver(4041);
 
         OAuthClientRequest accessTokenRequest = OAuthClientRequest
