@@ -9,10 +9,14 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    compile group: 'com.google.http-client', name: 'google-http-client', version: '1.34.2'
-    compile group: 'com.google.oauth-client', name: 'google-oauth-client', version: '1.30.6'
+    compile group: 'org.apache.oltu.oauth2', name: 'org.apache.oltu.oauth2.client', version: '1.0.2'
+    compile group: 'org.apache.oltu.oauth2', name: 'org.apache.oltu.oauth2.common', version: '1.0.2'
+    compile group: 'org.ini4j', name: 'ini4j', version: '0.5.4'
+    compile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+    implementation 'com.github.dmanchon:ngrok-java-client:0.1-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
