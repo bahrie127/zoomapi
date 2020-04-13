@@ -12,7 +12,6 @@ public class OAuthClient extends ZoomClient {
     private Integer port;
     private String redirectUri;
     private String browserPath;
-    private String token;
 
     public OAuthClient(String clientId, String clientSecret, Integer port,
                        String redirectUri, String browserPath, String dataType, Integer timeout) throws UnirestException,
@@ -23,11 +22,11 @@ public class OAuthClient extends ZoomClient {
         this.port = port;
         this.redirectUri = redirectUri;
         this.browserPath = browserPath;
-        this.token = new TokenHandler().getOAuthToken(clientId, clientSecret, redirectUri);
+        setToken(new TokenHandler().getOAuthToken(clientId, clientSecret, redirectUri));
     }
 
     public void refreshToken() throws OAuthProblemException, OAuthSystemException, IOException, UnirestException {
-        this.token = new TokenHandler().getOAuthToken(this.getApiKey(), this.getApiSecret(), redirectUri);
+        setToken(new TokenHandler().getOAuthToken(this.getApiKey(), this.getApiSecret(), redirectUri));
     }
 
     public Integer getPort() {

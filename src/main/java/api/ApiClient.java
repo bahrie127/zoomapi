@@ -4,9 +4,6 @@ import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,28 +18,11 @@ public class ApiClient {
 
     private String baseUri;
     private Integer timeout;
-    private String token;
+    private String token = null;
 
     public ApiClient(String baseUri, Integer timeout) throws UnirestException {
         this.baseUri = baseUri;
         this.timeout = timeout;
-
-        //Remove after
-        NgrokTunnel tunnel = new NgrokTunnel(4041);
-        String redirectUri = tunnel.url();
-        try {
-            this.token = new TokenHandler().getOAuthToken("CLIENT_ID",
-                    "CLIENT_SECRET", redirectUri);
-            System.out.println("Token: " + this.token);
-        } catch (OAuthSystemException e) {
-            System.out.println(e.getMessage());
-        } catch (OAuthProblemException e) {
-            System.out.println(e.getMessage());
-        } catch (UnirestException e) {
-            System.out.println(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private String urlFor(String endpoint) {
@@ -142,5 +122,9 @@ public class ApiClient {
 
     public Integer getTimeout() {
         return timeout;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

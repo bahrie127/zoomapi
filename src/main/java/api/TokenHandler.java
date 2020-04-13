@@ -60,7 +60,6 @@ public class TokenHandler {
     public String getOAuthToken(String clientId, String clientSecret,
                                 String redirectUri) throws OAuthSystemException, OAuthProblemException, UnirestException, IOException {
 
-        System.out.println("Redirect url " + redirectUri);
         OAuthClientRequest authorizationCodeRequest = OAuthClientRequest
                 .authorizationLocation("https://zoom.us/oauth/authorize")
                 .setResponseType("code")
@@ -68,7 +67,7 @@ public class TokenHandler {
                 .setRedirectURI(redirectUri)
                 .buildQueryMessage();
 
-        System.out.println("Location uri: " + authorizationCodeRequest.getLocationUri());
+        System.out.println("Opening browser for authentication at " + authorizationCodeRequest.getLocationUri());
         this.httpReceiver(4041);
 
         OAuthClientRequest accessTokenRequest = OAuthClientRequest
