@@ -11,11 +11,13 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
 
 public class TokenHandler {
 
@@ -45,6 +47,11 @@ public class TokenHandler {
         serverSocket.close();
     }
 
+    private void openBrowser(String redirectUri) throws IOException {
+        URI myUri = URI.create(redirectUri);
+        Desktop.getDesktop().browse(myUri);
+    }
+
     /**
      * Obtains OAuth access token
      *
@@ -68,6 +75,7 @@ public class TokenHandler {
                 .buildQueryMessage();
 
         System.out.println("Opening browser for authentication at " + authorizationCodeRequest.getLocationUri());
+        openBrowser(authorizationCodeRequest.getLocationUri());
         this.httpReceiver(4041);
 
         OAuthClientRequest accessTokenRequest = OAuthClientRequest

@@ -25,10 +25,26 @@ public class ApiClient {
         this.timeout = timeout;
     }
 
+    /**
+     * Generates API path URL
+     *
+     * @param endpoint Path URL
+     * @return Concatenated baseUri and endpoint
+     */
     private String urlFor(String endpoint) {
         return this.baseUri + endpoint;
     }
 
+    /**
+     * HTTP GET method request
+     *
+     * @param endpoint Path URL
+     * @param params Query parameters
+     * @return HttpResponse
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
     public HttpResponse getRequest(String endpoint, List<NameValuePair> params) throws IOException, InterruptedException, URISyntaxException {
         HttpClient client = HttpClient.newHttpClient();
 
@@ -45,6 +61,17 @@ public class ApiClient {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    /**
+     * HTTP POST method request
+     *
+     * @param endpoint Path URL
+     * @param params Query parameters
+     * @param data Request body
+     * @return HttpResponse
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public HttpResponse postRequest(String endpoint, List<NameValuePair> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         Gson gson = new Gson();
@@ -63,6 +90,17 @@ public class ApiClient {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    /**
+     * HTTP PUT method request
+     *
+     * @param endpoint Path URL
+     * @param params Query parameters
+     * @param data Request body
+     * @return HttpRequest
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public HttpResponse putRequest(String endpoint, List<NameValuePair> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         Gson gson = new Gson();
@@ -81,6 +119,16 @@ public class ApiClient {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    /**
+     * HTTP DELETE method request
+     *
+     * @param endpoint Path URL
+     * @param params Query parameters
+     * @return HttpRequest
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public HttpResponse deleteRequest(String endpoint, List<NameValuePair> params) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
@@ -98,6 +146,17 @@ public class ApiClient {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
+    /**
+     * HTTP PATCH method request
+     *
+     * @param endpoint Path URL
+     * @param params Query parameters
+     * @param data Request body
+     * @return HttpRequest
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public HttpResponse patchRequest(String endpoint, List<NameValuePair> params,  Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         Gson gson = new Gson();

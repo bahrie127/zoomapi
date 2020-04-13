@@ -20,11 +20,10 @@ public class OAuthBot {
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);
         String clientSecret = ini.get(SECTION_NAME, "client_secret", String.class);
         Integer port = ini.get(SECTION_NAME, "port", Integer.class);
-        String browserPath = ini.get(SECTION_NAME, "browser_path", String.class);
 
         NgrokTunnel tunnel = new NgrokTunnel(4041);
         String redirectUri = tunnel.url();
 
-        OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, browserPath, "json", 15);
+        OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, "json", 15);
     }
 }
