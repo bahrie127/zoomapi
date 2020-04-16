@@ -1,7 +1,6 @@
 package clients;
 
 import api.ApiClient;
-import api.TokenHandler;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
@@ -28,6 +27,10 @@ public class ZoomClient extends ApiClient {
 
     public String getApiSecret() {
         return apiSecret;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public String getDataType() {

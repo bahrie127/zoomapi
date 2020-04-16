@@ -25,5 +25,7 @@ public class OAuthBot {
         String redirectUri = tunnel.url();
 
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, "json", 15);
+
+        tunnel.close();
     }
 }
