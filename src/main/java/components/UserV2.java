@@ -9,6 +9,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
+ // main user class
 public class UserV2 extends BaseComponent {
     public UserV2(String baseUri, Integer timeout) throws UnirestException {
         super(baseUri, timeout);
