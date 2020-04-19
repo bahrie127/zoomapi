@@ -31,7 +31,7 @@ public class ApiClient {
      * @param endpoint Path URL
      * @return Concatenated baseUri and endpoint
      */
-    private String urlFor(String endpoint) {
+    protected String urlFor(String endpoint) {
         return this.baseUri + endpoint;
     }
 
@@ -186,4 +186,9 @@ public class ApiClient {
     public void setToken(String token) {
         this.token = token;
     }
+
+    public String getToken() {
+        return token;
+    }
+
 }
