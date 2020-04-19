@@ -24,6 +24,7 @@ public class ApiClient {
         this.baseUri = baseUri;
         this.timeout = timeout;
     }
+    public ApiClient() {}
 
     /**
      * Generates API path URL

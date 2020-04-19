@@ -22,6 +22,8 @@ public class BaseComponent extends ApiClient {
         super(baseUri, timeout);
     }
 
+    public BaseComponent() {}
+
     /**
      * HTTP POST method request
      *

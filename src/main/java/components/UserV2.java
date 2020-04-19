@@ -11,11 +11,23 @@ import java.util.Map;
 
  // main user class
 public class UserV2 extends BaseComponent {
-    public UserV2(String baseUri, Integer timeout) throws UnirestException {
-        super(baseUri, timeout);
-    }
+//    public UserV2(String baseUri, Integer timeout) throws UnirestException {
+//        super(baseUri, timeout);
+//    }
 
-    public HttpResponse listUsers(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+     private static UserV2 userv2 = null;
+
+     private UserV2() {
+        super();
+     }
+
+     public static UserV2 getInstance() {
+         if (userv2 == null)
+             userv2 = new UserV2();
+         return userv2;
+     }
+
+     public HttpResponse listUsers(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         return getRequest("/user/list", params);
     }
 
