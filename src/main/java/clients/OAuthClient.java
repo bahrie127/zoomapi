@@ -2,6 +2,7 @@ package clients;
 
 import api.TokenHandler;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import components.UserV2;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 
@@ -13,10 +14,10 @@ public class OAuthClient extends ZoomClient {
     private String redirectUri;
 
     public OAuthClient(String clientId, String clientSecret, Integer port,
-                       String redirectUri, String dataType, Integer timeout) throws UnirestException,
+                       String redirectUri, String dataType, Integer timeout, UserV2 userV2) throws UnirestException,
             OAuthSystemException, OAuthProblemException, IOException {
 
-        super(clientId, clientSecret, dataType, timeout);
+        super(clientId, clientSecret, dataType, timeout, userV2);
 
         this.port = port;
         this.redirectUri = redirectUri;
