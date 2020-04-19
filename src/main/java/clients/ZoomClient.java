@@ -11,12 +11,13 @@ public class ZoomClient extends ApiClient {
     private String dataType;
     private UserV2 userV2;
 
-    public ZoomClient(String apiKey, String apiSecret, String dataType, Integer timeout) throws UnirestException {
+    public ZoomClient(String apiKey, String apiSecret, String dataType, Integer timeout, UserV2 userV2) throws UnirestException {
         super("https://api.zoom.us/v2", timeout);
 
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
         this.dataType = dataType;
+        this.userV2 = userV2;
     }
 
     public String getApiKey() {
@@ -35,4 +36,7 @@ public class ZoomClient extends ApiClient {
         return dataType;
     }
 
+    public UserV2 getUserV2() {
+        return UserV2.getInstance();
+    }
 }
