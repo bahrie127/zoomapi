@@ -18,7 +18,7 @@ public class UserV2 extends BaseComponent {
      private static UserV2 userv2 = null;
 
      private UserV2() {
-        super();
+         super();
      }
 
      public static UserV2 getInstance() {

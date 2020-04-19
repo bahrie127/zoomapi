@@ -14,10 +14,10 @@ public class OAuthClient extends ZoomClient {
     private String redirectUri;
 
     public OAuthClient(String clientId, String clientSecret, Integer port,
-                       String redirectUri, String dataType, Integer timeout, UserV2 userV2) throws UnirestException,
+                       String redirectUri, String dataType, Integer timeout) throws UnirestException,
             OAuthSystemException, OAuthProblemException, IOException {
 
-        super(clientId, clientSecret, dataType, timeout, userV2);
+        super(clientId, clientSecret, dataType, timeout);
 
         this.port = port;
         this.redirectUri = redirectUri;
