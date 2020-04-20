@@ -1,7 +1,6 @@
 package api;
 
 import com.google.gson.Gson;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -11,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -20,11 +20,17 @@ public class ApiClient {
     private Integer timeout;
     private String token = null;
 
-    public ApiClient(String baseUri, Integer timeout) throws UnirestException {
-        this.baseUri = baseUri;
-        this.timeout = timeout;
+    private static ApiClient instance = null;
+
+    private ApiClient() {}
+
+    public static ApiClient getInstance() {
+        if (instance == null) {
+            instance = new ApiClient();
+        }
+
+        return instance;
     }
-    public ApiClient() {}
 
     /**
      * Generates API path URL
@@ -56,6 +62,7 @@ public class ApiClient {
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(uriBuilder.toString()))
+            .timeout(Duration.ofSeconds(this.timeout))
             .setHeader("Authorization", "Bearer " + this.token)
             .build();
 
@@ -84,6 +91,7 @@ public class ApiClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uriBuilder.toString()))
+                .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
@@ -113,6 +121,7 @@ public class ApiClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uriBuilder.toString()))
+                .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
                 .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
@@ -140,6 +149,7 @@ public class ApiClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uriBuilder.toString()))
+                .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
                 .DELETE()
                 .build();
@@ -169,6 +179,7 @@ public class ApiClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uriBuilder.toString()))
+                .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
@@ -176,20 +187,15 @@ public class ApiClient {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public String getBaseUri() {
-        return baseUri;
-    }
-
-    public Integer getTimeout() {
-        return timeout;
-    }
-
     public void setToken(String token) {
         this.token = token;
     }
 
-    public String getToken() {
-        return token;
+    public void setBaseUri(String baseUri) {
+        this.baseUri = baseUri;
     }
 
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
+    }
 }

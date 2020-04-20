@@ -1,21 +1,42 @@
 package clients;
 
 import api.ApiClient;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import components.*;
+import components.ChatChannels;
+import components.ChatMessages;
+import components.UserV2;
 
-public class ZoomClient extends ApiClient {
+public class ZoomClient {
 
     private String apiKey;
     private String apiSecret;
-    private String dataType;
+    private ApiClient apiClient;
+    private UserV2 userV2;
+    private ChatChannels chatChannels;
+    private ChatMessages chatMessages;
 
-    public ZoomClient(String apiKey, String apiSecret, String dataType, Integer timeout) throws UnirestException {
-        super("https://api.zoom.us/v2", timeout);
-
+    public ZoomClient(String apiKey, String apiSecret, Integer timeout) {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
-        this.dataType = dataType;
+
+        this.apiClient = ApiClient.getInstance();
+        apiClient.setBaseUri("https://api.zoom.us/v2");
+        apiClient.setTimeout(timeout);
+
+        this.userV2 = new UserV2();
+        this.chatChannels = new ChatChannels();
+        this.chatMessages = new ChatMessages();
+    }
+
+    public void refreshToken() {}
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+        refreshToken();
+    }
+
+    public void setApiSecret(String apiSecret) {
+        this.apiSecret = apiSecret;
+        refreshToken();
     }
 
     public String getApiKey() {
@@ -26,15 +47,19 @@ public class ZoomClient extends ApiClient {
         return apiSecret;
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
-
-    public String getDataType() {
-        return dataType;
+    public void setToken(String token) {
+        apiClient.setToken(token);
     }
 
     public UserV2 getUserV2() {
-        return UserV2.getInstance();
+        return userV2;
+    }
+
+    public ChatChannels getChatChannels() {
+        return chatChannels;
+    }
+
+    public ChatMessages getChatMessages() {
+        return chatMessages;
     }
 }

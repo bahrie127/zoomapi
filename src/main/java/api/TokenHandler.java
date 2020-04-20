@@ -1,6 +1,5 @@
 package api;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
@@ -61,11 +60,10 @@ public class TokenHandler {
      * @return Access Token for authentication purposes
      * @throws OAuthSystemException
      * @throws OAuthProblemException
-     * @throws UnirestException
      * @throws IOException
      */
     public String getOAuthToken(String clientId, String clientSecret,
-                                String redirectUri) throws OAuthSystemException, OAuthProblemException, UnirestException, IOException {
+                                String redirectUri) throws OAuthSystemException, OAuthProblemException, IOException {
 
         OAuthClientRequest authorizationCodeRequest = OAuthClientRequest
                 .authorizationLocation("https://zoom.us/oauth/authorize")
