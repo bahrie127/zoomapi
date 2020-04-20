@@ -2,7 +2,6 @@ package clients;
 
 import api.TokenHandler;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import components.UserV2;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 
@@ -12,16 +11,19 @@ public class OAuthClient extends ZoomClient {
 
     private Integer port;
     private String redirectUri;
+    private TokenHandler tokenHandler;
 
     public OAuthClient(String clientId, String clientSecret, Integer port,
-                       String redirectUri, String dataType, Integer timeout) throws UnirestException,
+                       String redirectUri, Integer timeout) throws UnirestException,
             OAuthSystemException, OAuthProblemException, IOException {
 
-        super(clientId, clientSecret, dataType, timeout);
+        super(clientId, clientSecret, timeout);
 
         this.port = port;
         this.redirectUri = redirectUri;
-        setToken(new TokenHandler().getOAuthToken(clientId, clientSecret, redirectUri));
+        this.tokenHandler = new TokenHandler();
+
+        setToken(tokenHandler.getOAuthToken(clientId, clientSecret, redirectUri));
     }
 
     /**
@@ -32,8 +34,13 @@ public class OAuthClient extends ZoomClient {
      * @throws IOException
      * @throws UnirestException
      */
-    public void refreshToken() throws OAuthProblemException, OAuthSystemException, IOException, UnirestException {
-        setToken(new TokenHandler().getOAuthToken(this.getApiKey(), this.getApiSecret(), redirectUri));
+    @Override
+    public void refreshToken() {
+        try {
+            setToken(tokenHandler.getOAuthToken(this.getApiKey(), this.getApiSecret(), redirectUri));
+        } catch (Exception exception) {
+            System.out.println("Error getting authorization token.");
+        }
     }
 
     public Integer getPort() {
