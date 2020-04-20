@@ -1,7 +1,9 @@
 package bots;
 
 import clients.OAuthClient;
+import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.http.NameValuePair;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -9,12 +11,15 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.http.HttpResponse;
+import java.util.List;
 
 public class OAuthBot {
 
     private static final String SECTION_NAME = "OAuth";
 
-    public static void main(String[] args) throws IOException, UnirestException, OAuthProblemException, OAuthSystemException {
+    public static void main(String[] args) throws IOException, UnirestException, OAuthProblemException, OAuthSystemException, URISyntaxException, InterruptedException {
         Wini ini = new Wini(new File(OAuthBot.class.getClassLoader().getResource("bot.ini").getFile()));
 
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);
@@ -25,6 +30,15 @@ public class OAuthBot {
         String redirectUri = tunnel.url();
 
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, "json", 15);
+
+        Gson gson = new Gson();
+
+        List<NameValuePair> params = null;
+
+//        HttpResponse userResponse = client.getUserV2().get("me", params);
+//        String user = gson.toJson(userResponse.body());
+//        System.out.println(user);
+//        System.out.println("----------");
 
         tunnel.close();
     }
