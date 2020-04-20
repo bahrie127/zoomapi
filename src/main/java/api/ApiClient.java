@@ -16,15 +16,17 @@ import java.util.Map;
 
 public class ApiClient {
 
+    private static Throttle throttle = new Throttle();
     private String baseUri;
     private Integer timeout;
     private String token = null;
 
     private static ApiClient instance = null;
 
-    private ApiClient() {}
+    private ApiClient() { }
 
-    public static ApiClient getInstance() {
+    public static ApiClient getInstance() throws InterruptedException {
+        throttle.permit();
         if (instance == null) {
             instance = new ApiClient();
         }
