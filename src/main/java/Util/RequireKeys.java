@@ -21,7 +21,6 @@ public class RequireKeys {
                 return true;
             else {
                 System.out.println("Missing Keyword: " + ourHardCodedString.get(i));
-                return false;
             }
         }
         return false;
