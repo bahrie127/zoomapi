@@ -1,9 +1,7 @@
 package clients;
 
 import api.ApiClient;
-import components.ChatChannels;
-import components.ChatMessages;
-import components.UserV2;
+import components.*;
 
 public class ZoomClient {
 
@@ -13,6 +11,10 @@ public class ZoomClient {
     private UserV2 userV2;
     private ChatChannels chatChannels;
     private ChatMessages chatMessages;
+    private MeetingV2 meetingV2;
+    private RecordingV2 recordingV2;
+    private ReportV2 reportV2;
+    private WebinarV2 webinarV2;
 
     public ZoomClient(String apiKey, String apiSecret, Integer timeout) throws InterruptedException {
         this.apiKey = apiKey;
@@ -62,4 +64,21 @@ public class ZoomClient {
     public ChatMessages getChatMessages() {
         return chatMessages;
     }
+
+    public MeetingV2 getMeetingV2() {
+        return meetingV2;
+    }
+
+    public RecordingV2 getRecordingV2() {
+        return recordingV2;
+    }
+
+    public ReportV2 getReportV2() {
+        return reportV2;
+    }
+
+    public WebinarV2 getWebinarV2() {
+        return webinarV2;
+    }
+
 }
