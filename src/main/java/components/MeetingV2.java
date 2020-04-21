@@ -14,7 +14,7 @@ public class MeetingV2 {
 
     public HttpResponse list(List<String> userID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(userID, "user_id");
-        return ApiClient.getInstance().getRequest("/users/"+userID+"/meetings", params);
+        return ApiClient.getInstance().getRequest("/users/"+userID.get(0)+"/meetings", params);
     }
 
     public HttpResponse create(List<String> userID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
@@ -22,12 +22,12 @@ public class MeetingV2 {
             data.put("start_time", DateToString.dateToString(data));
         }
         RequireKeys.requireKeys(userID, "user_id");
-        return ApiClient.getInstance().postRequest("/users/"+userID+"/meetings", params, data);
+        return ApiClient.getInstance().postRequest("/users/"+userID.get(0)+"/meetings", params, data);
     }
 
     public HttpResponse get(List<String> id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(id, "id");
-        return ApiClient.getInstance().getRequest("/meetings/"+id, params);
+        return ApiClient.getInstance().getRequest("/meetings/"+id.get(0), params);
     }
 
     public HttpResponse update(List<String> id, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
@@ -35,11 +35,11 @@ public class MeetingV2 {
             data.put("start_time", DateToString.dateToString(data));
         }
         RequireKeys.requireKeys(id, "id");
-        return ApiClient.getInstance().patchRequest("/meetings/"+id, params, data);
+        return ApiClient.getInstance().patchRequest("/meetings/"+id.get(0), params, data);
     }
 
     public HttpResponse delete(List<String> id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(id, "id");
-        return ApiClient.getInstance().deleteRequest("/meetings/"+id, params);
+        return ApiClient.getInstance().deleteRequest("/meetings/"+id.get(0), params);
     }
 }

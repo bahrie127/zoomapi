@@ -47,12 +47,7 @@ public class ChatChannels {
         return ApiClient.getInstance().deleteRequest("/chat/channels/"+channelID+"/members/"+memberID, params);
     }
 
-    public HttpResponse leaveChannelDel(String channelID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+    public HttpResponse leaveChannel(String channelID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getInstance().deleteRequest("/chat/channels/"+channelID+"/members/me", params);
-    }
-
-    public HttpResponse leaveChannel(String channelID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        leaveChannelDel(channelID, params);
-        return ApiClient.getInstance().postRequest("/chat/channels/"+channelID+"/members/me", params, data);
     }
 }
