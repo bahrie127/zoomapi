@@ -1,7 +1,6 @@
 package Util;
 
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
-import org.apache.http.NameValuePair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 public class RequireKeys {
 
 //    FIXME: Might need to come back and fix
-    public static boolean requireKeys(List<NameValuePair> userSentValue, Object valueThatWeWant) {
+    public static boolean requireKeys(List<String> userSentValue, Object valueThatWeWant) {
 
         List<String> ourHardCodedString = new ArrayList<>();
 
