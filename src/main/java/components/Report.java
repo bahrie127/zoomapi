@@ -10,7 +10,7 @@ import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
 
-public class ReportV2 {
+public class Report {
 
     public HttpResponse getUserReport(List<String> userValues, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getInstance().getRequest("report/users/"+userValues.get(0)+"/meetings", params);

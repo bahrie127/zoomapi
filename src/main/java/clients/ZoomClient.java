@@ -8,13 +8,13 @@ public class ZoomClient {
     private String apiKey;
     private String apiSecret;
     private ApiClient apiClient;
-    private UserV2 userV2;
+    private User user;
     private ChatChannels chatChannels;
     private ChatMessages chatMessages;
-    private MeetingV2 meetingV2;
-    private RecordingV2 recordingV2;
-    private ReportV2 reportV2;
-    private WebinarV2 webinarV2;
+    private Meeting meeting;
+    private Recording recording;
+    private Report report;
+    private Webinar webinar;
 
     public ZoomClient(String apiKey, String apiSecret, Integer timeout) throws InterruptedException {
         this.apiKey = apiKey;
@@ -24,7 +24,7 @@ public class ZoomClient {
         apiClient.setBaseUri("https://api.zoom.us/v2");
         apiClient.setTimeout(timeout);
 
-        this.userV2 = new UserV2();
+        this.user = new User();
         this.chatChannels = new ChatChannels();
         this.chatMessages = new ChatMessages();
     }
@@ -53,8 +53,8 @@ public class ZoomClient {
         apiClient.setToken(token);
     }
 
-    public UserV2 getUserV2() {
-        return userV2;
+    public User getUser() {
+        return user;
     }
 
     public ChatChannels getChatChannels() {
@@ -65,20 +65,20 @@ public class ZoomClient {
         return chatMessages;
     }
 
-    public MeetingV2 getMeetingV2() {
-        return meetingV2;
+    public Meeting getMeeting() {
+        return meeting;
     }
 
-    public RecordingV2 getRecordingV2() {
-        return recordingV2;
+    public Recording getRecording() {
+        return recording;
     }
 
-    public ReportV2 getReportV2() {
-        return reportV2;
+    public Report getReport() {
+        return report;
     }
 
-    public WebinarV2 getWebinarV2() {
-        return webinarV2;
+    public Webinar getWebinar() {
+        return webinar;
     }
 
 }

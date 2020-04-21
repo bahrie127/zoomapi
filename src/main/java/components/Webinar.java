@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class WebinarV2 {
+public class Webinar {
 
     public HttpResponse list(List<String> userID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(userID, "user_id");

@@ -9,7 +9,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
-public class UserV2 {
+public class User {
 
      public HttpResponse listUsers(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getInstance().getRequest("/user/list", params);

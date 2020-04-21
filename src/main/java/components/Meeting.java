@@ -10,7 +10,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
-public class MeetingV2 {
+public class Meeting {
 
     public HttpResponse list(List<String> userID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(userID, "user_id");
