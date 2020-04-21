@@ -16,7 +16,7 @@ public class Meeting {
 
     public HttpResponse list(List<String> hostID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
         if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data));
+            data.put("start_time", DateToString.dateToString(data.get("start_time")));
         }
         RequireKeys.requireKeys(hostID, "host_id");
         return ApiClient.getInstance().postRequest("/meeting/list", params, data);
@@ -24,7 +24,7 @@ public class Meeting {
 
     public HttpResponse create(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
         if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data));
+            data.put("start_time", DateToString.dateToString(data.get("start_time")));
         }
         RequireKeys.requireKeys(userValues, Arrays.asList("host_id", "topic", "type"));
         return ApiClient.getInstance().postRequest("/meeting/create", params, data);
@@ -32,7 +32,7 @@ public class Meeting {
 
     public HttpResponse update(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
         if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data));
+            data.put("start_time", DateToString.dateToString(data.get("start_time")));
         }
         RequireKeys.requireKeys(userValues, Arrays.asList("id", "host_id"));
         return ApiClient.getInstance().postRequest("/meeting/update", params, data);
