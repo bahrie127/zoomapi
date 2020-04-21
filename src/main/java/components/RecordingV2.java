@@ -21,12 +21,12 @@ public class RecordingV2 {
 
     public HttpResponse get(List<String> meetingID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(meetingID, "meeting_id");
-        return ApiClient.getInstance().getRequest("/meeting/"+meetingID+"/recordings", params);
+        return ApiClient.getInstance().getRequest("/meeting/"+meetingID.get(0)+"/recordings", params);
     }
 
     public HttpResponse delete(List<String> meetingID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(meetingID, "meeting_id");
-        return ApiClient.getInstance().deleteRequest("/meeting/"+meetingID+"/recordings", params);
+        return ApiClient.getInstance().deleteRequest("/meeting/"+meetingID.get(0)+"/recordings", params);
     }
 }
 /*
