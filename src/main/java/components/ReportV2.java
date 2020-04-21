@@ -11,19 +11,27 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ReportV2 {
-    // FIXME: NOT SURE WHAT TO DO WITH TO AND FROM
-    public HttpResponse getUserReport(List<String> userValues, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userValues, Arrays.asList("user_id", "start_time", "end_time"));
-        String from = (String) DateToString.dateToString(userValues.get(1));
-        String to = (String) DateToString.dateToString(userValues.get(2));
-        return ApiClient.getInstance().getRequest("report/users/"+userValues.get(0)+"/meetings", params);
+    public HttpResponse getUserReport(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(params, Arrays.asList("user_id", "start_time", "end_time"));
+
+        if(params.get(1).equals("start_time")) {
+            params.set(1, (NameValuePair) DateToString.dateToString(params.get(1)));
+        }
+        if(params.get(2).equals("end_time")) {
+            params.set(2, (NameValuePair) DateToString.dateToString(params.get(2)));
+        }
+        return ApiClient.getInstance().getRequest("report/users/"+params+"/meetings", params);
     }
 
-    // FIXME: NOT SURE WHAT TO DO WITH TO AND FROM
-    public HttpResponse getAccountReport(List<String> userValues, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userValues, Arrays.asList("start_time", "end_time"));
-        String from = (String) DateToString.dateToString(userValues.get(1));
-        String to = (String) DateToString.dateToString(userValues.get(2));
+    public HttpResponse getAccountReport(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(params, Arrays.asList("start_time", "end_time"));
+
+        if(params.get(0).equals("start_time")) {
+            params.set(0, (NameValuePair) DateToString.dateToString(params.get(0)));
+        }
+        if(params.get(1).equals("end_time")) {
+            params.set(1, (NameValuePair) DateToString.dateToString(params.get(1)));
+        }
         return ApiClient.getInstance().getRequest("report/users", params);
     }
 }
