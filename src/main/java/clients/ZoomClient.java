@@ -14,7 +14,7 @@ public class ZoomClient {
     private ChatChannels chatChannels;
     private ChatMessages chatMessages;
 
-    public ZoomClient(String apiKey, String apiSecret, Integer timeout) {
+    public ZoomClient(String apiKey, String apiSecret, Integer timeout) throws InterruptedException {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
 

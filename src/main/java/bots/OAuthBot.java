@@ -26,7 +26,6 @@ public class OAuthBot {
 
         NgrokTunnel tunnel = new NgrokTunnel(4041);
         String redirectUri = tunnel.url();
-
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 5);
 
         Gson gson = new Gson();
