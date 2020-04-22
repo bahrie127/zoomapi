@@ -3,14 +3,12 @@ package components;
 import api.ApiClient;
 import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
-import org.apache.http.NameValuePair;
 import util.DateUtil;
 import util.Validator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class Report {
@@ -31,7 +29,6 @@ public class Report {
         return ApiClient.getThrottledInstance().getRequest("report/users/"+userId+"/meetings", params);
     }
 
-    // FIXME: NOT SURE WHAT TO DO WITH TO AND FROM
     public JsonObject getAccountReport(Map<String, Object>params) throws InterruptedException, IOException, URISyntaxException {
 
         if (params.containsKey("start")) {

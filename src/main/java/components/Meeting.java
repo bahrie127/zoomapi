@@ -33,17 +33,17 @@ public class Meeting {
         return ApiClient.getThrottledInstance().getRequest("/meetings/"+id, params);
     }
 
-    public JsonObject update(String id, Map<String, Object> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject update(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("id", id);
 
         if(params.get("start_time") != null) {
             params.put("start_time", DateUtil.dateToString((Date) params.get("start_time")));
         }
 
-        return ApiClient.getThrottledInstance().patchRequest("/meetings/"+id, data);
+        return ApiClient.getThrottledInstance().patchRequest("/meetings/"+id, params);
     }
 
-    public JsonObject delete(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject delete(String id) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("id", id);
         return ApiClient.getThrottledInstance().deleteRequest("/meetings/"+id);
     }

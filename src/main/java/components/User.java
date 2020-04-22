@@ -19,12 +19,12 @@ public class User {
         return ApiClient.getThrottledInstance().postRequest("/users", params, data);
     }
 
-    public JsonObject updateUser(String id, Map<String, Object> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject updateUser(String id,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("id", id);
          return ApiClient.getThrottledInstance().patchRequest("/users/"+id, data);
     }
 
-    public JsonObject deleteUser(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject deleteUser(String id) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("id", id);
          return ApiClient.getThrottledInstance().deleteRequest("/users/"+id);
     }
