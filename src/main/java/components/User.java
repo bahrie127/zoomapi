@@ -1,35 +1,33 @@
 package components;
 
-import util.Validator;
 import api.ApiClient;
 import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
-import org.apache.http.NameValuePair;
+import util.Validator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Map;
 
 public class User {
 
-     public JsonObject listUsers(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+     public JsonObject listUsers(Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getThrottledInstance().getRequest("/user/list", params);
     }
 
-    public JsonObject createUser(List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+    public JsonObject createUser(Map<String, Object> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getThrottledInstance().postRequest("/users", params, data);
     }
 
-    public JsonObject updateUser(String id, List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+    public JsonObject updateUser(String id, Map<String, Object> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getThrottledInstance().patchRequest("/users/"+id, data);
     }
 
-    public JsonObject deleteUser(String id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+    public JsonObject deleteUser(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getThrottledInstance().deleteRequest("/users/"+id);
     }
 
-    public JsonObject get(String id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+    public JsonObject get(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getThrottledInstance().getRequest("/users/"+id, params);
     }
 

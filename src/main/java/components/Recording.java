@@ -1,29 +1,41 @@
 package components;
 
-import util.RequireKeys;
+import exceptions.InvalidArgumentException;
 import api.ApiClient;
 import com.google.gson.JsonObject;
-import org.apache.http.NameValuePair;
+import util.DateUtil;
+import util.Validator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Date;
+import java.util.Map;
 
 public class Recording {
 
-    // FIXME: Not sure how to get the to and from
-    public JsonObject list(List<String> userID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userID, "meeting_id");
-        return ApiClient.getThrottledInstance().getRequest("/users/"+userID.get(0)+"/recordings", params);
+    public JsonObject list(String userId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("userId", userId);
+
+        if (params.containsKey("start")) {
+            params.put("from", DateUtil.dateToString((Date) params.get("start")));
+            params.remove("start");
+        }
+
+        if (params.containsKey("end")) {
+            params.put("to", DateUtil.dateToString((Date) params.get("end")));
+            params.remove("end");
+        }
+
+        return ApiClient.getThrottledInstance().getRequest("/users/" + userId + "/recordings", params);
     }
 
-    public JsonObject get(List<String> meetingID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(meetingID, "meeting_id");
-        return ApiClient.getThrottledInstance().getRequest("/meeting/"+meetingID.get(0)+"/recordings", params);
+    public JsonObject get(String meetingId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("meetingId", meetingId);
+        return ApiClient.getThrottledInstance().getRequest("/meeting/" + meetingId + "/recordings", params);
     }
 
-    public JsonObject delete(List<String> meetingID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(meetingID, "meeting_id");
-        return ApiClient.getThrottledInstance().deleteRequest("/meeting/"+meetingID.get(0)+"/recordings");
+    public JsonObject delete(String meetingId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("meetingId", meetingId);
+        return ApiClient.getThrottledInstance().deleteRequest("/meeting/" + meetingId + "/recordings");
     }
 }
