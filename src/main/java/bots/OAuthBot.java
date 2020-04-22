@@ -64,11 +64,14 @@ public class OAuthBot {
         System.out.println("----------");
 
         //FIXME: this is not working for some reason
-        System.out.println(gson.toJson(client.getChatChannels().joinChannel("channelId")));
+        System.out.println(gson.toJson(client.getChatChannels().joinChannel("publicChannelId")));
         System.out.println("----------");
 
         //FIXME: this is not working for some reason
-        System.out.println(gson.toJson(client.getChatChannels().leaveChannel("channelId")));
+        System.out.println(gson.toJson(client.getChatChannels().leaveChannel("publicChannelId")));
+        System.out.println("----------");
+
+        System.out.println(gson.toJson(client.getChatChannels().deleteChannel(channelId)));
         System.out.println("----------");
 
         tunnel.close();
