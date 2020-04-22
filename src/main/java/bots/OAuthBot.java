@@ -69,8 +69,7 @@ public class OAuthBot {
         System.out.println("----------");
 
         System.out.println("Leaving channel");
-        System.out.println(gson.toJson(client.getChatChannels().leaveChannel(channelId)));
-        System.out.println("----------");
+        gson.toJson(client.getChatChannels().leaveChannel(channelId));
 
         System.out.println("Joining channel");
         System.out.println(gson.toJson(client.getChatChannels().joinChannel(channelId)));

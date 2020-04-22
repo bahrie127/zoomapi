@@ -1,5 +1,12 @@
 ### Zoom API
 
+## Building the project
+```
+./gradlew build
+```
+
 ## Running
-Run ngrok start --none
-Then run application
+```
+ngrok start --none
+./gradlew run
+```
