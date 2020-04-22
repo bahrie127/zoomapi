@@ -7,6 +7,7 @@ import util.Validator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Webinar {
@@ -31,17 +32,18 @@ public class Webinar {
         return ApiClient.getThrottledInstance().deleteRequest("/webinars/"+id);
     }
 
-    public JsonObject end(String id, Map<String, Object> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject end(String id) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("id", id);
 
-        if(params.get("status").equals("end"));{
-            return ApiClient.getThrottledInstance().putRequest("/webinars/"+id+"/status", params, data);
-        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("status", "end");
+
+        return ApiClient.getThrottledInstance().putRequest("/webinars/" + id + "/status", null);
     }
 
     public JsonObject get(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("id", id);
-        return ApiClient.getThrottledInstance().getRequest("/webinars/"+id, params);
+        return ApiClient.getThrottledInstance().getRequest("/webinars/"+ id, params);
     }
 
     public JsonObject register(String id, String email, String firstName, String lastName, Map<String, Object> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {

@@ -31,13 +31,15 @@ public class OAuthBot {
         String redirectUri = tunnel.url();
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 5);
 
+        tunnel.close();
+
         Gson gson = new Gson();
 
         System.out.println(gson.toJson(client.getUser().get("me", null)));
         System.out.println("----------");
 
         // Testing chat channels component
-        JsonObject createChannelResponse = client.getChatChannels().createChannel("tester", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
+        /*JsonObject createChannelResponse = client.getChatChannels().createChannel("testing", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
         System.out.println(gson.toJson(createChannelResponse));
         String channelId = createChannelResponse.get("id").getAsString();
         System.out.println("----------");
@@ -72,10 +74,19 @@ public class OAuthBot {
         System.out.println("----------");
 
         System.out.println(gson.toJson(client.getChatChannels().deleteChannel(channelId)));
+        System.out.println("----------");*/
+
+        //Testing chat messages
+        JsonObject messageResponse = client.getChatMessages().postMessage("Hello!", "rafael.bellotti@gmail.com", 0);
+        System.out.println(gson.toJson(messageResponse));
+        String messageId = messageResponse.get("id").getAsString();
         System.out.println("----------");
 
-        tunnel.close();
+        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "rafael.bellotti@gmail.com", 0, null)));
+        System.out.println("----------");
 
+        client.getChatMessages().putMessage(messageId, "Changed message", "rafael.bellotti@gmail.com", 0);
 
+        client.getChatMessages().deleteMessage(messageId, "rafael.bellotti@gmail.com", 0);
     }
 }
