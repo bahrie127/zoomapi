@@ -20,13 +20,17 @@ public class ZoomClient {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
 
-        this.apiClient = ApiClient.getInstance();
+        this.apiClient = ApiClient.getThrottledInstance();
         apiClient.setBaseUri("https://api.zoom.us/v2");
         apiClient.setTimeout(timeout);
 
         this.user = new User();
         this.chatChannels = new ChatChannels();
         this.chatMessages = new ChatMessages();
+        this.meeting = new Meeting();
+        this.recording = new Recording();
+        this.report = new Report();
+        this.webinar = new Webinar();
     }
 
     public void refreshToken() {}

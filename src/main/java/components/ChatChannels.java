@@ -1,53 +1,107 @@
 package components;
 
+import util.Validator;
 import api.ApiClient;
+import com.google.gson.JsonObject;
+import exceptions.InvalidArgumentException;
 import org.apache.http.NameValuePair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ChatChannels {
 
-    public HttpResponse listChannels(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().getRequest("/chat/users/me/channels", params);
+    public JsonObject listChannels(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        return ApiClient.getThrottledInstance().getRequest("/chat/users/me/channels", params);
     }
 
-    public HttpResponse createChannel(List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/chat/users/me/channels", params, data);
+    public JsonObject createChannel(String name, int type, List<String> members) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+
+        Validator.validateString("name", name);
+        Validator.validateBoundaries("type", type, 1, 4);
+
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("name", name);
+        data.put("type", type);
+
+        if (members != null) {
+            List<Map<String, String>> membersData = new ArrayList<>();
+            for (String email : members) {
+                Map<String, String> memberData = new HashMap<>();
+                memberData.put("email", email);
+
+                membersData.add(memberData);
+            }
+
+            data.put("members", membersData);
+        }
+
+        return ApiClient.getThrottledInstance().postRequest("/chat/users/me/channels", data);
     }
 
-    public HttpResponse getChannel(String channelID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().getRequest("/chat/channels/"+channelID, params);
+    public JsonObject getChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+        return ApiClient.getThrottledInstance().getRequest("/chat/channels/" + channelId);
     }
 
-    public HttpResponse deleteChannel(String channelID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().deleteRequest("/chat/channels/"+channelID, params);
+    public JsonObject deleteChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+        return ApiClient.getThrottledInstance().deleteRequest("/chat/channels/" + channelId);
     }
 
-    public HttpResponse listMembers(String channelID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().getRequest("/chat/channels/"+channelID+"/members", params);
+    public JsonObject listMembers(String channelId, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+        return ApiClient.getThrottledInstance().getRequest("/chat/channels/" + channelId +"/members", params);
     }
 
-    public HttpResponse updateChannel(String channelID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().patchRequest("/chat/channels/"+channelID, params, data);
+    public JsonObject updateChannel(String channelId, String name) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+        Validator.validateString("name", name);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(name, name);
+
+        return ApiClient.getThrottledInstance().patchRequest("/chat/channels/" + channelId, data);
     }
 
-    public HttpResponse joinChannel(String channelID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/chat/channels/"+channelID+"/members/me", params, data);
+    public JsonObject joinChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+        return ApiClient.getThrottledInstance().postRequest("/chat/channels/"+ channelId +"/members/me", null);
     }
 
-    public HttpResponse inviteMembers(String channelID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/chat/channels/"+channelID+"/members", params, data);
+    public JsonObject inviteMembers(String channelId, List<String> members) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+        Validator.validateList("members", members);
+
+        Map<String, Object> data = new HashMap<>();
+        List<Map<String, String>> membersData = new ArrayList<>();
+        for (String email : members) {
+            Map<String, String> memberData = new HashMap<>();
+            memberData.put("email", email);
+
+            membersData.add(memberData);
+        }
+
+        data.put("members", membersData);
+
+        return ApiClient.getThrottledInstance().postRequest("/chat/channels/" + channelId + "/members", data);
     }
 
-    public HttpResponse removeMembers(String channelID, String memberID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().deleteRequest("/chat/channels/"+channelID+"/members/"+memberID, params);
+    public JsonObject removeMember(String channelId, String memberId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+        Validator.validateString("memberId", memberId);
+
+        return ApiClient.getThrottledInstance().deleteRequest("/chat/channels/"+ channelId +"/members/"+ memberId);
     }
 
-    public HttpResponse leaveChannel(String channelID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().deleteRequest("/chat/channels/"+channelID+"/members/me", params);
+    public JsonObject leaveChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("channelId", channelId);
+
+        return ApiClient.getThrottledInstance().deleteRequest("/chat/channels/" + channelId + "/members/me");
     }
 }
