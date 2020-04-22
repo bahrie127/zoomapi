@@ -14,8 +14,8 @@ public class OAuthClient extends ZoomClient {
     private TokenHandler tokenHandler;
 
     public OAuthClient(String clientId, String clientSecret, Integer port,
-                       String redirectUri, Integer timeout) throws UnirestException,
-            OAuthSystemException, OAuthProblemException, IOException, InterruptedException {
+                       String redirectUri, Integer timeout) throws OAuthSystemException,
+            OAuthProblemException, IOException, InterruptedException {
 
         super(clientId, clientSecret, timeout);
 

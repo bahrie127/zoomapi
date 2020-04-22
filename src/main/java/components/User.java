@@ -1,47 +1,40 @@
 package components;
 
+import util.Validator;
 import api.ApiClient;
+import com.google.gson.JsonObject;
+import exceptions.InvalidArgumentException;
 import org.apache.http.NameValuePair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
-public class User{
+public class User {
 
-    public HttpResponse list(List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/list", params, data);
+     public JsonObject listUsers(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        return ApiClient.getThrottledInstance().getRequest("/user/list", params);
     }
 
-    public HttpResponse pending(List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/pending", params, data);
+    public JsonObject createUser(List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+        return ApiClient.getThrottledInstance().postRequest("/users", params, data);
     }
 
-    public HttpResponse create(List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/create", params, data);
+    public JsonObject updateUser(String id, List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+        return ApiClient.getThrottledInstance().patchRequest("/users/"+id, data);
     }
 
-    public HttpResponse update(String id, List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/update/"+id, params, data);
+    public JsonObject deleteUser(String id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        return ApiClient.getThrottledInstance().deleteRequest("/users/"+id);
     }
 
-    public HttpResponse delete(String id, List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/delete/"+id, params, data);
+    public JsonObject get(String id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        return ApiClient.getThrottledInstance().getRequest("/users/"+id, params);
     }
 
-    // "type" or "email"
-    public HttpResponse custCreate(String email, List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/custcreate/"+email, params, data);
-    }
-
-    public HttpResponse get(String id, List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/get/"+id, params, data);
-    }
-
-    // "email" or "login type"
-    public HttpResponse getByEmail(String email, List<NameValuePair> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getInstance().postRequest("/user/getbyemail/"+email, params, data);
+    public JsonObject getPermissions(String userId) throws InvalidArgumentException, InterruptedException, IOException, URISyntaxException {
+        Validator.validateString("userId", userId);
+         return ApiClient.getThrottledInstance().getRequest("/users/" + userId + "/permissions");
     }
 }

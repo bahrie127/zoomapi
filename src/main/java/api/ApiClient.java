@@ -1,6 +1,7 @@
 package api;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -16,16 +17,19 @@ import java.util.Map;
 
 public class ApiClient {
 
-    private static Throttle throttle = new Throttle();
+    private static Throttle throttle = new Throttle(3);
     private String baseUri;
     private Integer timeout;
     private String token = null;
+    private Gson gson;
 
     private static ApiClient instance = null;
 
-    private ApiClient() { }
+    private ApiClient() {
+        this.gson = new Gson();
+    }
 
-    public static ApiClient getInstance() throws InterruptedException {
+    public static ApiClient getThrottledInstance() throws InterruptedException {
         throttle.permit();
         if (instance == null) {
             instance = new ApiClient();
@@ -48,13 +52,34 @@ public class ApiClient {
      * HTTP GET method request
      *
      * @param endpoint Path URL
-     * @param params Query parameters
-     * @return HttpResponse
+     * @return JsonObject
      * @throws IOException
      * @throws InterruptedException
      * @throws URISyntaxException
      */
-    public HttpResponse getRequest(String endpoint, List<NameValuePair> params) throws IOException, InterruptedException, URISyntaxException {
+    public JsonObject getRequest(String endpoint) throws IOException, InterruptedException, URISyntaxException {
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(urlFor(endpoint)))
+            .timeout(Duration.ofSeconds(this.timeout))
+            .setHeader("Authorization", "Bearer " + this.token)
+            .build();
+
+        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+    }
+
+    /**
+     * HTTP GET method request
+     *
+     * @param endpoint Path URL
+     * @param params Query parameters
+     * @return JsonObject
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
+    public JsonObject getRequest(String endpoint, List<NameValuePair> params) throws IOException, InterruptedException, URISyntaxException {
         HttpClient client = HttpClient.newHttpClient();
 
         URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
@@ -63,12 +88,12 @@ public class ApiClient {
         }
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(uriBuilder.toString()))
-            .timeout(Duration.ofSeconds(this.timeout))
-            .setHeader("Authorization", "Bearer " + this.token)
-            .build();
+                .uri(URI.create(uriBuilder.toString()))
+                .timeout(Duration.ofSeconds(this.timeout))
+                .setHeader("Authorization", "Bearer " + this.token)
+                .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
     }
 
     /**
@@ -77,28 +102,48 @@ public class ApiClient {
      * @param endpoint Path URL
      * @param params Query parameters
      * @param data Request body
-     * @return HttpResponse
+     * @return JsonObject
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public HttpResponse postRequest(String endpoint, List<NameValuePair> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
+    public JsonObject postRequest(String endpoint, List<NameValuePair> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        Gson gson = new Gson();
 
         URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
-        if (params != null) {
-            uriBuilder.addParameters(params);
-        }
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uriBuilder.toString()))
                 .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
+                .setHeader("Content-type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+    }
+
+    /**
+     * HTTP POST method request
+     *
+     * @param endpoint Path URL
+     * @return JsonObject
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public JsonObject postRequest(String endpoint, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(urlFor(endpoint)))
+                .timeout(Duration.ofSeconds(this.timeout))
+                .setHeader("Authorization", "Bearer " + this.token)
+                .setHeader("Content-type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
+                .build();
+
+        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
     }
 
     /**
@@ -107,14 +152,13 @@ public class ApiClient {
      * @param endpoint Path URL
      * @param params Query parameters
      * @param data Request body
-     * @return HttpRequest
+     * @return JsonObject
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public HttpResponse putRequest(String endpoint, List<NameValuePair> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
+    public JsonObject putRequest(String endpoint, List<NameValuePair> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        Gson gson = new Gson();
 
         URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
         if (params != null) {
@@ -125,68 +169,62 @@ public class ApiClient {
                 .uri(URI.create(uriBuilder.toString()))
                 .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
+                .setHeader("Content-type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
     }
 
     /**
      * HTTP DELETE method request
      *
      * @param endpoint Path URL
-     * @param params Query parameters
-     * @return HttpRequest
+     * @return JsonObject
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public HttpResponse deleteRequest(String endpoint, List<NameValuePair> params) throws URISyntaxException, IOException, InterruptedException {
+    public JsonObject deleteRequest(String endpoint) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
-        URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
-        if (params != null) {
-            uriBuilder.addParameters(params);
-        }
-
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uriBuilder.toString()))
+                .uri(URI.create(urlFor(endpoint)))
                 .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
+                .setHeader("Content-type", "application/json")
                 .DELETE()
                 .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
     }
 
     /**
      * HTTP PATCH method request
      *
      * @param endpoint Path URL
-     * @param params Query parameters
      * @param data Request body
-     * @return HttpRequest
+     * @return JsonObject
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public HttpResponse patchRequest(String endpoint, List<NameValuePair> params,  Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
+    public JsonObject patchRequest(String endpoint, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        Gson gson = new Gson();
-
-        URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
-        if (params != null) {
-            uriBuilder.addParameters(params);
-        }
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uriBuilder.toString()))
+                .uri(URI.create(urlFor(endpoint)))
                 .timeout(Duration.ofSeconds(this.timeout))
                 .setHeader("Authorization", "Bearer " + this.token)
+                .setHeader("Content-type", "application/json")
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+    }
+
+    private JsonObject toJsonObject(HttpResponse response) {
+        return gson.fromJson(response.body().toString(), JsonObject.class);
     }
 
     public void setToken(String token) {

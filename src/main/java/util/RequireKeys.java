@@ -1,4 +1,4 @@
-package Util;
+package util;
 
 import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 
