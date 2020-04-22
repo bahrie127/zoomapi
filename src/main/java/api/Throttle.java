@@ -12,7 +12,6 @@ public class Throttle {
     }
 
     public void permit() throws InterruptedException {
-        System.out.println(currentNumberCalls);
         Long now = System.currentTimeMillis();
         if (currentNumberCalls == 0 || (lastChecked - now) > SECOND) {
             currentNumberCalls = 1;

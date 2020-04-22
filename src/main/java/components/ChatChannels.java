@@ -63,7 +63,7 @@ public class ChatChannels {
         Validator.validateString("name", name);
 
         Map<String, Object> data = new HashMap<>();
-        data.put(name, name);
+        data.put("name", name);
 
         return ApiClient.getThrottledInstance().patchRequest("/chat/channels/" + channelId, data);
     }

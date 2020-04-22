@@ -35,54 +35,65 @@ public class OAuthBot {
 
         Gson gson = new Gson();
 
+        System.out.println("User");
         System.out.println(gson.toJson(client.getUser().get("me", null)));
         System.out.println("----------");
 
         // Testing chat channels component
-        JsonObject createChannelResponse = client.getChatChannels().createChannel("My Test Channel", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
+        System.out.println("Creating channel");
+        JsonObject createChannelResponse = client.getChatChannels().createChannel("A Test Channel", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
         System.out.println(gson.toJson(createChannelResponse));
         String channelId = createChannelResponse.get("id").getAsString();
         System.out.println("----------");
 
+        System.out.println("Getting channel information");
         System.out.println(gson.toJson(client.getChatChannels().getChannel(channelId)));
         System.out.println("----------");
 
+        System.out.println("Listing channels");
         System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
         System.out.println("----------");
 
+        System.out.println("Listing channel members");
         System.out.println(gson.toJson(client.getChatChannels().listMembers(channelId, null)));
         System.out.println("----------");
 
+        System.out.println("Removing member from channel");
         gson.toJson(client.getChatChannels().removeMember(channelId, "4esghsytteeabljsq8vdrw"));
 
-        //FIXME: this is not working for some reason
-        System.out.println(gson.toJson(client.getChatChannels().updateChannel(channelId, "My New Channel")));
-        System.out.println("----------");
+        System.out.println("Updating channel");
+        gson.toJson(client.getChatChannels().updateChannel(channelId, "My New Channel"));
 
+        System.out.println("Inviting member to channel");
         System.out.println(gson.toJson(client.getChatChannels().inviteMembers(channelId, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")))));
         System.out.println("----------");
 
-        //FIXME: this is not working for some reason
-        /*System.out.println(gson.toJson(client.getChatChannels().joinChannel("publicChannelId")));
+        System.out.println("Leaving channel");
+        System.out.println(gson.toJson(client.getChatChannels().leaveChannel(channelId)));
         System.out.println("----------");
 
-        //FIXME: this is not working for some reason
-        System.out.println(gson.toJson(client.getChatChannels().leaveChannel("publicChannelId")));
-        System.out.println("----------");*/
+        System.out.println("Joining channel");
+        System.out.println(gson.toJson(client.getChatChannels().joinChannel(channelId)));
+        System.out.println("----------");
 
+        System.out.println("Deleting channel");
         gson.toJson(client.getChatChannels().deleteChannel(channelId));
 
         //Testing chat messages
+        System.out.println("Sending message");
         JsonObject messageResponse = client.getChatMessages().postMessage("Hello!", "rafael.bellotti@gmail.com", 0);
         System.out.println(gson.toJson(messageResponse));
         String messageId = messageResponse.get("id").getAsString();
         System.out.println("----------");
 
+        System.out.println("Listing messages");
         System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "rafael.bellotti@gmail.com", 0, null)));
         System.out.println("----------");
 
+        System.out.println("Updated message");
         client.getChatMessages().putMessage(messageId, "Changed message", "rafael.bellotti@gmail.com", 0);
 
+        System.out.println("Deleted message");
         client.getChatMessages().deleteMessage(messageId, "rafael.bellotti@gmail.com", 0);
     }
 }
