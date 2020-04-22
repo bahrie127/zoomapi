@@ -1,10 +1,9 @@
 package components;
 
-import util.Validator;
 import api.ApiClient;
 import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
-import org.apache.http.NameValuePair;
+import util.Validator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 public class ChatChannels {
 
-    public JsonObject listChannels(List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+    public JsonObject listChannels(Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
         return ApiClient.getThrottledInstance().getRequest("/chat/users/me/channels", params);
     }
 
@@ -54,7 +53,7 @@ public class ChatChannels {
         return ApiClient.getThrottledInstance().deleteRequest("/chat/channels/" + channelId);
     }
 
-    public JsonObject listMembers(String channelId, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject listMembers(String channelId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
         return ApiClient.getThrottledInstance().getRequest("/chat/channels/" + channelId +"/members", params);
     }
