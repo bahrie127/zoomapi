@@ -33,9 +33,9 @@ public class Webinar {
     }
 
 //    TODO: REVIEW PARAMS STATUS : END
-    public JsonObject end(List<String> id, Map<String, Object> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+    public JsonObject end(List<String> id, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(id, "id");
-        return ApiClient.getThrottledInstance().putRequest("/webinars/"+id.get(0)+"/status", params, data);
+        return ApiClient.getThrottledInstance().putRequest("/webinars/"+id.get(0)+"/status", data);
     }
 
     public JsonObject get(List<String> id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
