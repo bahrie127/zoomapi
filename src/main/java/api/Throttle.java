@@ -4,7 +4,7 @@ public class Throttle {
 
     private Long lastChecked = null;
     private Integer currentNumberCalls = 0;
-    private int maxNumberCalls; //documentation mentions no more than 10 requests/second
+    private int maxNumberCalls;
     private static final Long SECOND = 1000L;
 
     public Throttle(int maxNumberCalls) {
@@ -12,6 +12,7 @@ public class Throttle {
     }
 
     public void permit() throws InterruptedException {
+        System.out.println(currentNumberCalls);
         Long now = System.currentTimeMillis();
         if (currentNumberCalls == 0 || (lastChecked - now) > SECOND) {
             currentNumberCalls = 1;

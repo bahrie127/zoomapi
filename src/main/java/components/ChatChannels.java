@@ -43,12 +43,12 @@ public class ChatChannels {
         return ApiClient.getThrottledInstance().postRequest("/chat/users/me/channels", data);
     }
 
-    public JsonObject getChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject getChannel(String channelId) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
         return ApiClient.getThrottledInstance().getRequest("/chat/channels/" + channelId);
     }
 
-    public JsonObject deleteChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject deleteChannel(String channelId) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
         return ApiClient.getThrottledInstance().deleteRequest("/chat/channels/" + channelId);
     }
@@ -58,7 +58,7 @@ public class ChatChannels {
         return ApiClient.getThrottledInstance().getRequest("/chat/channels/" + channelId +"/members", params);
     }
 
-    public JsonObject updateChannel(String channelId, String name) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject updateChannel(String channelId, String name) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
         Validator.validateString("name", name);
 
@@ -68,12 +68,12 @@ public class ChatChannels {
         return ApiClient.getThrottledInstance().patchRequest("/chat/channels/" + channelId, data);
     }
 
-    public JsonObject joinChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject joinChannel(String channelId) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
         return ApiClient.getThrottledInstance().postRequest("/chat/channels/"+ channelId +"/members/me", null);
     }
 
-    public JsonObject inviteMembers(String channelId, List<String> members) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject inviteMembers(String channelId, List<String> members) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
         Validator.validateList("members", members);
 
@@ -91,14 +91,14 @@ public class ChatChannels {
         return ApiClient.getThrottledInstance().postRequest("/chat/channels/" + channelId + "/members", data);
     }
 
-    public JsonObject removeMember(String channelId, String memberId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject removeMember(String channelId, String memberId) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
         Validator.validateString("memberId", memberId);
 
         return ApiClient.getThrottledInstance().deleteRequest("/chat/channels/"+ channelId +"/members/"+ memberId);
     }
 
-    public JsonObject leaveChannel(String channelId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject leaveChannel(String channelId) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("channelId", channelId);
 
         return ApiClient.getThrottledInstance().deleteRequest("/chat/channels/" + channelId + "/members/me");

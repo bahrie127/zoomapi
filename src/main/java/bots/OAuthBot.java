@@ -39,7 +39,7 @@ public class OAuthBot {
         System.out.println("----------");
 
         // Testing chat channels component
-        /*JsonObject createChannelResponse = client.getChatChannels().createChannel("testing", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
+        JsonObject createChannelResponse = client.getChatChannels().createChannel("My Test Channel", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
         System.out.println(gson.toJson(createChannelResponse));
         String channelId = createChannelResponse.get("id").getAsString();
         System.out.println("----------");
@@ -53,28 +53,24 @@ public class OAuthBot {
         System.out.println(gson.toJson(client.getChatChannels().listMembers(channelId, null)));
         System.out.println("----------");
 
-        //FIXME: this is not working for some reason
-        System.out.println(gson.toJson(client.getChatChannels().updateChannel(channelId, "Testing")));
-        System.out.println("----------");
+        gson.toJson(client.getChatChannels().removeMember(channelId, "4esghsytteeabljsq8vdrw"));
 
         //FIXME: this is not working for some reason
-        System.out.println(gson.toJson(client.getChatChannels().removeMember("1d02647a-5235-40ce-accd-90ed9e61905a", "4esghsytteeabljsq8vdrw")));
+        System.out.println(gson.toJson(client.getChatChannels().updateChannel(channelId, "My New Channel")));
         System.out.println("----------");
 
-        //FIXME: this is not working for some reason
         System.out.println(gson.toJson(client.getChatChannels().inviteMembers(channelId, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")))));
         System.out.println("----------");
 
         //FIXME: this is not working for some reason
-        System.out.println(gson.toJson(client.getChatChannels().joinChannel("publicChannelId")));
+        /*System.out.println(gson.toJson(client.getChatChannels().joinChannel("publicChannelId")));
         System.out.println("----------");
 
         //FIXME: this is not working for some reason
         System.out.println(gson.toJson(client.getChatChannels().leaveChannel("publicChannelId")));
-        System.out.println("----------");
-
-        System.out.println(gson.toJson(client.getChatChannels().deleteChannel(channelId)));
         System.out.println("----------");*/
+
+        gson.toJson(client.getChatChannels().deleteChannel(channelId));
 
         //Testing chat messages
         JsonObject messageResponse = client.getChatMessages().postMessage("Hello!", "rafael.bellotti@gmail.com", 0);

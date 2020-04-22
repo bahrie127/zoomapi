@@ -43,6 +43,7 @@ public class TokenHandler {
         socket.getOutputStream().write(httpResponse.getBytes("UTF-8"));
         socket.getOutputStream().flush();
 
+        socket.close();
         serverSocket.close();
     }
 

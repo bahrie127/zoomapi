@@ -2,7 +2,6 @@ package api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
