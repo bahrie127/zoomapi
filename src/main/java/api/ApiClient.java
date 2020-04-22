@@ -15,7 +15,8 @@ import java.util.Map;
 
 public class ApiClient {
 
-    private static Throttle throttle = new Throttle(5); //using a rate lower than the documentation as advised
+    //using a rate lower than the documentation as advised, 1 call every 2 seconds since it is a basic plan
+    private static Throttle throttle = new Throttle(1, 2000L);
     private String baseUri;
     private Integer timeout;
     private String token = null;

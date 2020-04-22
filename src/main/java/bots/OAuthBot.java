@@ -29,7 +29,7 @@ public class OAuthBot {
 
         NgrokTunnel tunnel = new NgrokTunnel(4041);
         String redirectUri = tunnel.url();
-        OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 5);
+        OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
         tunnel.close();
 
@@ -59,24 +59,30 @@ public class OAuthBot {
         System.out.println("----------");
 
         System.out.println("Removing member from channel");
-        gson.toJson(client.getChatChannels().removeMember(channelId, "4esghsytteeabljsq8vdrw"));
+        System.out.println(gson.toJson(client.getChatChannels().removeMember(channelId, "4esghsytteeabljsq8vdrw")));
 
         System.out.println("Updating channel");
-        gson.toJson(client.getChatChannels().updateChannel(channelId, "My New Channel"));
+        client.getChatChannels().updateChannel(channelId, "My New Channel");
 
         System.out.println("Inviting member to channel");
         System.out.println(gson.toJson(client.getChatChannels().inviteMembers(channelId, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")))));
         System.out.println("----------");
 
+        System.out.println("Creating channel for deletion");
+        JsonObject createChannelToBeDeletedResponse = client.getChatChannels().createChannel("To Be Deleted", 1, new ArrayList<>());
+        System.out.println(gson.toJson(createChannelToBeDeletedResponse));
+        String deletedChannelId = createChannelToBeDeletedResponse.get("id").getAsString();
+        System.out.println("----------");
+
         System.out.println("Leaving channel");
-        gson.toJson(client.getChatChannels().leaveChannel(channelId));
+        client.getChatChannels().leaveChannel(channelId);
 
         System.out.println("Joining channel");
         System.out.println(gson.toJson(client.getChatChannels().joinChannel(channelId)));
         System.out.println("----------");
 
         System.out.println("Deleting channel");
-        gson.toJson(client.getChatChannels().deleteChannel(channelId));
+        client.getChatChannels().deleteChannel(deletedChannelId);
 
         //Testing chat messages
         System.out.println("Sending message");
