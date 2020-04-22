@@ -19,16 +19,19 @@ public class User {
         return ApiClient.getThrottledInstance().postRequest("/users", params, data);
     }
 
-    public JsonObject updateUser(String id, Map<String, Object> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getThrottledInstance().patchRequest("/users/"+id, data);
+    public JsonObject updateUser(String id,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("id", id);
+         return ApiClient.getThrottledInstance().patchRequest("/users/"+id, data);
     }
 
-    public JsonObject deleteUser(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getThrottledInstance().deleteRequest("/users/"+id);
+    public JsonObject deleteUser(String id) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("id", id);
+         return ApiClient.getThrottledInstance().deleteRequest("/users/"+id);
     }
 
-    public JsonObject get(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
-        return ApiClient.getThrottledInstance().getRequest("/users/"+id, params);
+    public JsonObject get(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("id", id);
+         return ApiClient.getThrottledInstance().getRequest("/users/"+id, params);
     }
 
     public JsonObject getPermissions(String userId) throws InvalidArgumentException, InterruptedException, IOException, URISyntaxException {
