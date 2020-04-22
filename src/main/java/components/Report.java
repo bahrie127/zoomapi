@@ -1,29 +1,46 @@
 package components;
 
+import api.ApiClient;
 import com.google.gson.JsonObject;
-import org.apache.http.NameValuePair;
+import exceptions.InvalidArgumentException;
+import util.DateUtil;
+import util.Validator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
 
 public class Report {
-    // FIXME: NOT SURE WHAT TO DO WITH TO AND FROM
-    public JsonObject getUserReport(List<String> userValues, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
-        /*RequireKeys.requireKeys(userValues, Arrays.asList("user_id", "start_time", "end_time"));
-        String from = (String) DateUtil.dateToString(userValues.get(1));
-        String to = (String) DateUtil.dateToString(userValues.get(2));
-        return ApiClient.getThrottledInstance().getRequest("report/users/"+userValues.get(0)+"/meetings", params);*/
-        return null;
+
+    public JsonObject getUserReport(String userId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+        Validator.validateString("userId", userId);
+
+        if (params.containsKey("start")) {
+            params.put("from", DateUtil.dateToString((Date) params.get("start")));
+            params.remove("start");
+        }
+
+        if (params.containsKey("end")) {
+            params.put("to", DateUtil.dateToString((Date) params.get("end")));
+            params.remove("end");
+        }
+
+        return ApiClient.getThrottledInstance().getRequest("report/users/"+userId+"/meetings", params);
     }
 
-    // FIXME: NOT SURE WHAT TO DO WITH TO AND FROM
-    public JsonObject getAccountReport(List<String> userValues, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
-        /*RequireKeys.requireKeys(userValues, Arrays.asList("start_time", "end_time"));
-        String from = (String) DateUtil.dateToString(userValues.get(1));
-        String to = (String) DateUtil.dateToString(userValues.get(2));
-        return ApiClient.getThrottledInstance().getRequest("report/users", params);*/
-        return null;
+    public JsonObject getAccountReport(Map<String, Object>params) throws InterruptedException, IOException, URISyntaxException {
+
+        if (params.containsKey("start")) {
+            params.put("from", DateUtil.dateToString((Date) params.get("start")));
+            params.remove("start");
+        }
+
+        if (params.containsKey("end")) {
+            params.put("to", DateUtil.dateToString((Date) params.get("end")));
+            params.remove("end");
+        }
+
+        return ApiClient.getThrottledInstance().getRequest("report/users", params);
     }
 }

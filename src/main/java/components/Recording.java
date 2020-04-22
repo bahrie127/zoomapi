@@ -34,7 +34,7 @@ public class Recording {
         return ApiClient.getThrottledInstance().getRequest("/meeting/" + meetingId + "/recordings", params);
     }
 
-    public JsonObject delete(String meetingId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public JsonObject delete(String meetingId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("meetingId", meetingId);
         return ApiClient.getThrottledInstance().deleteRequest("/meeting/" + meetingId + "/recordings");
     }
