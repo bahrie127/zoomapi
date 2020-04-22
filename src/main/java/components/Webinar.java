@@ -1,6 +1,5 @@
 package components;
 
-import Util.DateToString;
 import Util.RequireKeys;
 import api.ApiClient;
 import org.apache.http.NameValuePair;
@@ -14,58 +13,39 @@ import java.util.Map;
 
 public class Webinar {
 
-    public HttpResponse list(List<String> hostID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(hostID, "host_id");
-        if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data.get("start_time")));
-        }
-        return ApiClient.getInstance().postRequest("/webinar/list", params, data);
+    public HttpResponse list(List<String> userID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(userID, "user_id");
+        return ApiClient.getInstance().getRequest("/users/"+userID.get(0)+"/webinars", params);
     }
 
-    public HttpResponse upcoming(List<String> hostID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(hostID, "host_id");
-        if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data.get("start_time")));
-        }
-        return ApiClient.getInstance().postRequest("/webinar/list/registration", params, data);
+    public HttpResponse create(List<String> userID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(userID, "user_id");
+        return ApiClient.getInstance().postRequest("/users/"+userID.get(0)+"/webinars", params, data);
     }
 
-    public HttpResponse create(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userValues, Arrays.asList("host_id","topic"));
-        if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data.get("start_time")));
-        }
-        return ApiClient.getInstance().postRequest("/webinar/create", params, data);
+    public HttpResponse update(List<String> id, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(id, "id");
+        return ApiClient.getInstance().patchRequest("/webinars/"+id.get(0), params, data);
     }
 
-    public HttpResponse update(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userValues, Arrays.asList("id","host_id"));
-        if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data.get("start_time")));
-        }
-        return ApiClient.getInstance().postRequest("/webinar/update", params, data);
+    public HttpResponse delete(List<String> id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(id, "id");
+        return ApiClient.getInstance().deleteRequest("/webinars/"+id.get(0), params);
     }
 
-    public HttpResponse delete(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userValues, Arrays.asList("id","host_id"));
-        return ApiClient.getInstance().postRequest("/webinar/delete", params, data);
+//    TODO: REVIEW PARAMS STATUS : END
+    public HttpResponse end(List<String> id, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(id, "id");
+        return ApiClient.getInstance().putRequest("/webinars/"+id.get(0)+"/status", params, data);
     }
 
-    public HttpResponse end(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userValues, Arrays.asList("id","host_id"));
-        return ApiClient.getInstance().postRequest("/webinar/end", params, data);
-    }
-
-    public HttpResponse get(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(userValues, Arrays.asList("id","host_id"));
-        return ApiClient.getInstance().postRequest("/webinar/get", params, data);
+    public HttpResponse get(List<String> id, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(id, "id");
+        return ApiClient.getInstance().getRequest("/webinars/"+id.get(0), params);
     }
 
     public HttpResponse register(List<String> userValues, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(userValues, Arrays.asList("id", "email", "first_name", "last_name"));
-        if(data.get("start_time") != null) {
-            data.put("start_time", DateToString.dateToString(data.get("start_time")));
-        }
-        return ApiClient.getInstance().postRequest("/webinar/register", params, data);
+        return ApiClient.getInstance().postRequest("/webinars/"+userValues.get(0)+"/registrants", params, data);
     }
 }

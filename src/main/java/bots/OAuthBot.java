@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 
 public class OAuthBot {
@@ -34,7 +32,7 @@ public class OAuthBot {
 
         Gson gson = new Gson();
 
-        HttpResponse userResponse = client.getUserV2().get("me", null);
+        HttpResponse userResponse = client.getUser().get("me", null);
         String user = gson.toJson(userResponse.body());
         System.out.println(user);
         System.out.println("----------");

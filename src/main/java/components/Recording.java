@@ -1,6 +1,5 @@
 package components;
 
-import Util.DateToString;
 import Util.RequireKeys;
 import api.ApiClient;
 import org.apache.http.NameValuePair;
@@ -8,37 +7,38 @@ import org.apache.http.NameValuePair;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Recording {
 
-//    FIXME: need to add start and end
-    public HttpResponse list(List<String> hostId, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        RequireKeys.requireKeys(hostId, "host_id");
-        return ApiClient.getInstance().postRequest("/recording/list", params, data);
+    // FIXME: Not sure how to get the to and from
+    public HttpResponse list(List<String> userID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
+        RequireKeys.requireKeys(userID, "meeting_id");
+        return ApiClient.getInstance().getRequest("/users/"+userID.get(0)+"/recordings", params);
     }
 
-    public HttpResponse delete(List<String> meetingID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+    public HttpResponse get(List<String> meetingID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(meetingID, "meeting_id");
-        return ApiClient.getInstance().postRequest("/recording/delete", params, data);
+        return ApiClient.getInstance().getRequest("/meeting/"+meetingID.get(0)+"/recordings", params);
     }
 
-    public HttpResponse get(List<String> meetingID, List<NameValuePair> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
+    public HttpResponse delete(List<String> meetingID, List<NameValuePair> params) throws InterruptedException, IOException, URISyntaxException {
         RequireKeys.requireKeys(meetingID, "meeting_id");
-        return ApiClient.getInstance().postRequest("/recording/get", params, data);
+        return ApiClient.getInstance().deleteRequest("/meeting/"+meetingID.get(0)+"/recordings", params);
     }
 }
-
 /*
-def list(self, **kwargs):
-        util.require_keys(kwargs, "host_id")
+  def list(self, **kwargs):
+        util.require_keys(kwargs, "user_id")
         start = kwargs.pop("start", None)
         if start:
             kwargs["from"] = util.date_to_str(start)
         end = kwargs.pop("end", None)
         if end:
             kwargs["to"] = util.date_to_str(end)
-        return self.post_request("/recording/list", params=kwargs)
-
+        return self.get_request(
+            "/users/{}/recordings".format(kwargs.get("user_id")), params=kwargs
+        )
  */
