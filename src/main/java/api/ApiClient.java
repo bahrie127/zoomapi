@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class ApiClient {
 
-    private static Throttle throttle = new Throttle(3);
+    private static Throttle throttle = new Throttle(1);
     private String baseUri;
     private Integer timeout;
     private String token = null;

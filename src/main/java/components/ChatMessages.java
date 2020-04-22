@@ -6,7 +6,6 @@ import org.apache.http.NameValuePair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
