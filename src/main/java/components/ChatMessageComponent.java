@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptions.InvalidArgumentException;
 import models.ChannelMemberPage;
+import models.MessagePage;
 import models.SentMessage;
 import util.Validator;
 
@@ -27,7 +28,7 @@ public class ChatMessageComponent {
             .create();
     }
 
-    public ChannelMemberPage listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public MessagePage listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("userId", userId);
         Validator.validateString("to", to);
         Validator.validateBoundaries("recipientType", recipientType, TO_CONTACT, TO_CHANNEL);
@@ -38,7 +39,7 @@ public class ChatMessageComponent {
         params.put(toRecipientType(recipientType), to);
         HttpResponse response = ApiClient.getThrottledInstance().getRequest("/chat/users/" + userId + "/messages", params);
 
-        return gson.fromJson(response.body().toString(), ChannelMemberPage.class);
+        return gson.fromJson(response.body().toString(), MessagePage.class);
     }
 
     public SentMessage postMessage(String message, String to, int recipientType) throws InterruptedException, IOException, InvalidArgumentException {
