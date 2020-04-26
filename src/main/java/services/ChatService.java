@@ -25,7 +25,6 @@ public class ChatService {
     }
 
     private Channel findByChannelName(String channelName) throws InterruptedException, IOException, URISyntaxException {
-        List<String> channelObj = new ArrayList<>();
         ChannelPage channelPage = chatChannels.listChannels(null);;
 
         for(Channel channel: channelPage.getChannels()) {
