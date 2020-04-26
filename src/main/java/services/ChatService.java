@@ -2,6 +2,7 @@ package services;
 
 import components.ChatChannelComponent;
 import components.ChatMessageComponent;
+import exceptions.InvalidArgumentException;
 import models.Channel;
 import models.ChannelPage;
 
@@ -20,13 +21,14 @@ public class ChatService {
         this.chatMessages = new ChatMessageComponent();
     }
 
-    public void sendMessage(String channel, String message) {
+    public void sendMessage(String channel, String message) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
 
+        Channel currentChannel = findByChannelName(channel);
+        chatMessages.postMessage(message, currentChannel.getId(), 1);
     }
 
     private Channel findByChannelName(String channelName) throws InterruptedException, IOException, URISyntaxException {
 
-        List<String> channelObj = new ArrayList<>();
         ChannelPage channelPage = chatChannels.listChannels(null);;
 
         for(Channel channel: channelPage.getChannels()) {
