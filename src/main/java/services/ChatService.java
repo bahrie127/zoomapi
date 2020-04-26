@@ -3,6 +3,7 @@ package services;
 import components.ChatChannelComponent;
 import components.ChatMessageComponent;
 import exceptions.InvalidArgumentException;
+import interfaces.MessageInterface;
 import models.*;
 
 import java.io.IOException;
@@ -59,6 +60,19 @@ public class ChatService {
         } catch(InterruptedException | IOException | URISyntaxException | InvalidArgumentException exception) { }
 
         return messageHistory;
+    }
+
+    public List<Message> search(String channelName, MessageInterface condition) {
+        List<Message> messages = new ArrayList<>();
+        List<Message> messageHistory = history(channelName);
+
+        for (Message message : messageHistory) {
+            if (condition.call(message)) {
+                messages.add(message);
+            }
+        }
+
+        return messages;
     }
 
 }
