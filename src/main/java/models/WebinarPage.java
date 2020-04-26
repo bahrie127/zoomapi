@@ -2,13 +2,13 @@ package models;
 
 import java.util.List;
 
-public class UserPage {
+public class WebinarPage {
 
     private int pageCount;
     private int pageNumber;
     private int pageSize;
     private int totalRecords;
-    private List<UserFile> user;
+    private List<WebinarFile> webinars;
 
     public int getPageCount() {
         return pageCount;
@@ -42,11 +42,11 @@ public class UserPage {
         this.totalRecords = totalRecords;
     }
 
-    public List<UserFile> getUser() {
-        return user;
+    public List<WebinarFile> getWebinars() {
+        return webinars;
     }
 
-    public void setUser(List<UserFile> user) {
-        this.user = user;
+    public void setWebinars(List<WebinarFile> webinars) {
+        this.webinars = webinars;
     }
 }
