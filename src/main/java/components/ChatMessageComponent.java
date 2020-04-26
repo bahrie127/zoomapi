@@ -1,21 +1,33 @@
 package components;
 
 import api.ApiClient;
-import com.google.gson.JsonObject;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import exceptions.InvalidArgumentException;
+import models.ChannelMemberPage;
+import models.SentMessage;
 import util.Validator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChatMessages {
+public class ChatMessageComponent {
 
     private static final int TO_CONTACT = 0;
     private static final int TO_CHANNEL = 1;
+    private Gson gson;
 
-    public JsonObject listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public ChatMessageComponent() {
+        this.gson = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
+    }
+
+    public ChannelMemberPage listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
         Validator.validateString("userId", userId);
         Validator.validateString("to", to);
         Validator.validateBoundaries("recipientType", recipientType, TO_CONTACT, TO_CHANNEL);
@@ -24,10 +36,12 @@ public class ChatMessages {
             params = new HashMap<>();
         }
         params.put(toRecipientType(recipientType), to);
-        return ApiClient.getThrottledInstance().getRequest("/chat/users/" + userId + "/messages", params);
+        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/chat/users/" + userId + "/messages", params);
+
+        return gson.fromJson(response.body().toString(), ChannelMemberPage.class);
     }
 
-    public JsonObject postMessage(String message, String to, int recipientType) throws InterruptedException, IOException, InvalidArgumentException {
+    public SentMessage postMessage(String message, String to, int recipientType) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("message", message);
         Validator.validateString("to", to);
         Validator.validateBoundaries("recipientType", recipientType, TO_CONTACT, TO_CHANNEL);
@@ -36,10 +50,11 @@ public class ChatMessages {
         data.put("message", message);
         data.put(toRecipientType(recipientType), to);
 
-        return ApiClient.getThrottledInstance().postRequest("/chat/users/me/messages/", data);
+        HttpResponse response = ApiClient.getThrottledInstance().postRequest("/chat/users/me/messages/", data);
+        return gson.fromJson(response.body().toString(), SentMessage.class);
     }
 
-    public JsonObject putMessage(String messageId, String message, String to, int recipientType) throws InterruptedException, IOException, InvalidArgumentException {
+    public void putMessage(String messageId, String message, String to, int recipientType) throws InterruptedException, IOException, InvalidArgumentException {
         Validator.validateString("messageId", messageId);
         Validator.validateString("message", message);
         Validator.validateString("to", to);
@@ -49,10 +64,10 @@ public class ChatMessages {
         data.put("message", message);
         data.put(toRecipientType(recipientType), to);
 
-        return ApiClient.getThrottledInstance().putRequest("/chat/users/me/messages/" + messageId, data);
+        ApiClient.getThrottledInstance().putRequest("/chat/users/me/messages/" + messageId, data);
     }
 
-    public JsonObject deleteMessage(String messageId, String to, int recipientType) throws InterruptedException, IOException, InvalidArgumentException, URISyntaxException {
+    public void deleteMessage(String messageId, String to, int recipientType) throws InterruptedException, IOException, InvalidArgumentException, URISyntaxException {
         Validator.validateString("messageId", messageId);
         Validator.validateString("to", to);
         Validator.validateBoundaries("recipientType", recipientType, TO_CONTACT, TO_CHANNEL);
@@ -60,7 +75,7 @@ public class ChatMessages {
         Map<String, Object> params = new HashMap<>();
         params.put(toRecipientType(recipientType), to);
 
-        return ApiClient.getThrottledInstance().deleteRequest("/chat/users/me/messages/" + messageId, params);
+        ApiClient.getThrottledInstance().deleteRequest("/chat/users/me/messages/" + messageId, params);
     }
 
     private String toRecipientType(int recipientType) {

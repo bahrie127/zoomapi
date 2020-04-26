@@ -2,19 +2,21 @@ package clients;
 
 import api.ApiClient;
 import components.*;
+import services.ChatService;
 
 public class ZoomClient {
 
     private String apiKey;
     private String apiSecret;
     private ApiClient apiClient;
-    private User user;
-    private ChatChannels chatChannels;
-    private ChatMessages chatMessages;
-    private Meeting meeting;
-    private Recording recording;
-    private Report report;
-    private Webinar webinar;
+    private UserComponent user;
+    private ChatChannelComponent chatChannels;
+    private ChatMessageComponent chatMessages;
+    private MeetingComponent meeting;
+    private RecordingComponent recording;
+    private ReportComponent report;
+    private WebinarComponent webinar;
+    private ChatService chat;
 
     public ZoomClient(String apiKey, String apiSecret, Integer timeout) throws InterruptedException {
         this.apiKey = apiKey;
@@ -24,13 +26,14 @@ public class ZoomClient {
         apiClient.setBaseUri("https://api.zoom.us/v2");
         apiClient.setTimeout(timeout);
 
-        this.user = new User();
-        this.chatChannels = new ChatChannels();
-        this.chatMessages = new ChatMessages();
-        this.meeting = new Meeting();
-        this.recording = new Recording();
-        this.report = new Report();
-        this.webinar = new Webinar();
+        this.user = new UserComponent();
+        this.chatChannels = new ChatChannelComponent();
+        this.chatMessages = new ChatMessageComponent();
+        this.meeting = new MeetingComponent();
+        this.recording = new RecordingComponent();
+        this.report = new ReportComponent();
+        this.webinar = new WebinarComponent();
+        this.chat = new ChatService();
     }
 
     public void refreshToken() {}
@@ -57,32 +60,35 @@ public class ZoomClient {
         apiClient.setToken(token);
     }
 
-    public User getUser() {
+    public UserComponent getUser() {
         return user;
     }
 
-    public ChatChannels getChatChannels() {
+    public ChatChannelComponent getChatChannels() {
         return chatChannels;
     }
 
-    public ChatMessages getChatMessages() {
+    public ChatMessageComponent getChatMessages() {
         return chatMessages;
     }
 
-    public Meeting getMeeting() {
+    public MeetingComponent getMeeting() {
         return meeting;
     }
 
-    public Recording getRecording() {
+    public RecordingComponent getRecording() {
         return recording;
     }
 
-    public Report getReport() {
+    public ReportComponent getReport() {
         return report;
     }
 
-    public Webinar getWebinar() {
+    public WebinarComponent getWebinar() {
         return webinar;
     }
 
+    public ChatService getChat() {
+        return chat;
+    }
 }

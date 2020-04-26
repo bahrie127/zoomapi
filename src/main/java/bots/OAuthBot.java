@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import exceptions.InvalidArgumentException;
+import models.Channel;
+import models.SentMessage;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -31,8 +33,6 @@ public class OAuthBot {
         String redirectUri = tunnel.url();
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
-        tunnel.close();
-
         Gson gson = new Gson();
 
         System.out.println("User");
@@ -41,9 +41,9 @@ public class OAuthBot {
 
         // Testing chat channels component
         System.out.println("Creating channel");
-        JsonObject createChannelResponse = client.getChatChannels().createChannel("A Test Channel", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
+        Channel createChannelResponse = client.getChatChannels().createChannel("A Test Channel", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
         System.out.println(gson.toJson(createChannelResponse));
-        String channelId = createChannelResponse.get("id").getAsString();
+        String channelId = createChannelResponse.getId();
         System.out.println("----------");
 
         System.out.println("Getting channel information");
@@ -59,7 +59,7 @@ public class OAuthBot {
         System.out.println("----------");
 
         System.out.println("Removing member from channel");
-        System.out.println(gson.toJson(client.getChatChannels().removeMember(channelId, "4esghsytteeabljsq8vdrw")));
+        client.getChatChannels().removeMember(channelId, "4esghsytteeabljsq8vdrw");
 
         System.out.println("Updating channel");
         client.getChatChannels().updateChannel(channelId, "My New Channel");
@@ -69,9 +69,9 @@ public class OAuthBot {
         System.out.println("----------");
 
         System.out.println("Creating channel for deletion");
-        JsonObject createChannelToBeDeletedResponse = client.getChatChannels().createChannel("To Be Deleted", 1, new ArrayList<>());
+        Channel createChannelToBeDeletedResponse = client.getChatChannels().createChannel("To Be Deleted", 1, new ArrayList<>());
         System.out.println(gson.toJson(createChannelToBeDeletedResponse));
-        String deletedChannelId = createChannelToBeDeletedResponse.get("id").getAsString();
+        String deletedChannelId = createChannelToBeDeletedResponse.getId();
         System.out.println("----------");
 
         System.out.println("Leaving channel");
@@ -86,9 +86,9 @@ public class OAuthBot {
 
         //Testing chat messages
         System.out.println("Sending message");
-        JsonObject messageResponse = client.getChatMessages().postMessage("Hello!", "rafael.bellotti@gmail.com", 0);
+        SentMessage messageResponse = client.getChatMessages().postMessage("Hello!", "rafael.bellotti@gmail.com", 0);
         System.out.println(gson.toJson(messageResponse));
-        String messageId = messageResponse.get("id").getAsString();
+        String messageId = messageResponse.getId();
         System.out.println("----------");
 
         System.out.println("Listing messages");
@@ -100,5 +100,7 @@ public class OAuthBot {
 
         System.out.println("Deleted message");
         client.getChatMessages().deleteMessage(messageId, "rafael.bellotti@gmail.com", 0);
+
+        tunnel.close();
     }
 }
