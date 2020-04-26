@@ -51,12 +51,12 @@ public class ApiClient {
      * HTTP GET method request
      *
      * @param endpoint Path URL
-     * @return JsonObject
+     * @return HttpResponse
      * @throws IOException
      * @throws InterruptedException
      * @throws URISyntaxException
      */
-    public JsonObject getRequest(String endpoint) throws IOException, InterruptedException {
+    public HttpResponse getRequest(String endpoint) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -65,7 +65,7 @@ public class ApiClient {
             .setHeader("Authorization", "Bearer " + this.token)
             .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -73,12 +73,12 @@ public class ApiClient {
      *
      * @param endpoint Path URL
      * @param params Query parameters
-     * @return JsonObject
+     * @return HttpResponse
      * @throws IOException
      * @throws InterruptedException
      * @throws URISyntaxException
      */
-    public JsonObject getRequest(String endpoint, Map<String, Object> params) throws IOException, InterruptedException, URISyntaxException {
+    public HttpResponse getRequest(String endpoint, Map<String, Object> params) throws IOException, InterruptedException, URISyntaxException {
         HttpClient client = HttpClient.newHttpClient();
 
         URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
@@ -95,7 +95,7 @@ public class ApiClient {
                 .setHeader("Authorization", "Bearer " + this.token)
                 .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -104,12 +104,12 @@ public class ApiClient {
      * @param endpoint Path URL
      * @param params Query parameters
      * @param data Request body
-     * @return JsonObject
+     * @return HttpResponse
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public JsonObject postRequest(String endpoint, Map<String, Object> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
+    public HttpResponse postRequest(String endpoint, Map<String, Object> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
@@ -127,19 +127,19 @@ public class ApiClient {
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
      * HTTP POST method request
      *
      * @param endpoint Path URL
-     * @return JsonObject
+     * @return HttpResponse
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public JsonObject postRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
+    public HttpResponse postRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -150,7 +150,7 @@ public class ApiClient {
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -158,12 +158,12 @@ public class ApiClient {
      *
      * @param endpoint Path URL
      * @param data Request body
-     * @return JsonObject
+     * @return HttpResponse
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public JsonObject putRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
+    public HttpResponse putRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -174,19 +174,19 @@ public class ApiClient {
                 .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
      * HTTP DELETE method request
      *
      * @param endpoint Path URL
-     * @return JsonObject
+     * @return HttpResponse
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public JsonObject deleteRequest(String endpoint) throws IOException, InterruptedException {
+    public HttpResponse deleteRequest(String endpoint) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -197,7 +197,7 @@ public class ApiClient {
                 .DELETE()
                 .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -205,12 +205,12 @@ public class ApiClient {
      *
      * @param endpoint Path URL
      * @param params Query parameters
-     * @return JsonObject
+     * @return HttpResponse
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public JsonObject deleteRequest(String endpoint, Map<String, Object> params) throws IOException, InterruptedException, URISyntaxException {
+    public HttpResponse deleteRequest(String endpoint, Map<String, Object> params) throws IOException, InterruptedException, URISyntaxException {
         HttpClient client = HttpClient.newHttpClient();
 
         URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
@@ -228,7 +228,7 @@ public class ApiClient {
                 .DELETE()
                 .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -236,12 +236,12 @@ public class ApiClient {
      *
      * @param endpoint Path URL
      * @param data Request body
-     * @return JsonObject
+     * @return HttpResponse
      * @throws URISyntaxException
      * @throws IOException
      * @throws InterruptedException
      */
-    public JsonObject patchRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
+    public HttpResponse patchRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -252,11 +252,7 @@ public class ApiClient {
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
                 .build();
 
-        return toJsonObject(client.send(request, HttpResponse.BodyHandlers.ofString()));
-    }
-
-    private JsonObject toJsonObject(HttpResponse response) {
-        return gson.fromJson(response.body().toString(), JsonObject.class);
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     public void setToken(String token) {
