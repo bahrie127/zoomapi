@@ -1,6 +1,7 @@
 package bots;
 
 import clients.OAuthClient;
+import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import exceptions.InvalidComponentException;
 import models.Channel;
@@ -13,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PopulateBot {
 
@@ -30,10 +33,12 @@ public class PopulateBot {
         String redirectUri = tunnel.url();
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
-        for (int i = 0; i < 51; i++) {
+        /*for (int i = 0; i < 51; i++) {
             client.getChatChannels().createChannel("A Test Channel", 1, new ArrayList<>());
             System.out.println(i);
-        }
+        }*/
+
+        System.out.println(new Gson().toJson(client.getChatChannels().listMembers("109ab13498c64fd5911a42be1076ea6b", null)));
 
         tunnel.close();
     }

@@ -1,8 +1,8 @@
 package bots;
 
 import clients.OAuthClient;
+import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
@@ -11,7 +11,6 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class ServiceBot {
 
@@ -31,10 +30,11 @@ public class ServiceBot {
 
         tunnel.close();
 
-        client.getChat().sendMessage("test", "Hello this is a test message.");
-        //client.getChat().history("test");
-        //client.getChat().search("test", (message) -> message.getSender().contains("diva"));
-        //client.getChat().search("test", (message) -> message.getMessage().contains("hello"));
+        Gson gson = new Gson();
+        //client.getChat().sendMessage("test", "Hello this is a test message.");
+        System.out.println(gson.toJson(client.getChat().history("test")));
+        //System.out.println(gson.toJson(client.getChat().search("test", (message) -> message.getSender().contains("rafael"))));
+        //System.out.println(gson.toJson(client.getChat().search("test", (message) -> message.getMessage().contains("Hello"))));
 
     }
 }
