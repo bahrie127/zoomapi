@@ -2,9 +2,7 @@ package bots;
 
 import clients.OAuthClient;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import models.Channel;
 import models.SentMessage;
@@ -15,7 +13,6 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 

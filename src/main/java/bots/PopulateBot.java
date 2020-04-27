@@ -2,8 +2,8 @@ package bots;
 
 import clients.OAuthClient;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
+import models.Channel;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -11,13 +11,15 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-public class ServiceBot {
+public class PopulateBot {
 
     private static final String SECTION_NAME = "OAuth";
 
-    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidComponentException {
+    public static void main(String[] args) throws UnirestException, IOException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidComponentException {
+
         Wini ini = new Wini(new File(OAuthBot.class.getClassLoader().getResource("bot.ini").getFile()));
 
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);
@@ -26,15 +28,13 @@ public class ServiceBot {
 
         NgrokTunnel tunnel = new NgrokTunnel(4041);
         String redirectUri = tunnel.url();
-
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
+        for (int i = 0; i < 51; i++) {
+            client.getChatChannels().createChannel("A Test Channel", 1, new ArrayList<>());
+            System.out.println(i);
+        }
+
         tunnel.close();
-
-        client.getChat().sendMessage("test", "Hello this is a test message.");
-        //client.getChat().history("test");
-        //client.getChat().search("test", (message) -> message.getSender().contains("diva"));
-        //client.getChat().search("test", (message) -> message.getMessage().contains("hello"));
-
     }
 }
