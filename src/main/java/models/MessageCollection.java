@@ -2,12 +2,21 @@ package models;
 
 import java.util.List;
 
-public class ChannelMemberPage {
+public class MessageCollection {
 
+    private String date;
     private int totalRecords;
     private int pageSize;
     private String nextPageToken;
-    private List<ChannelMember> members;
+    private List<Message> messages;
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public int getTotalRecords() {
         return totalRecords;
@@ -33,11 +42,11 @@ public class ChannelMemberPage {
         this.nextPageToken = nextPageToken;
     }
 
-    public List<ChannelMember> getMembers() {
-        return members;
+    public List<Message> getMessages() {
+        return messages;
     }
 
-    public void setMembers(List<ChannelMember> members) {
-        this.members = members;
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
     }
 }

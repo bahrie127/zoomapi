@@ -5,14 +5,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptions.InvalidArgumentException;
 import api.ApiClient;
-import com.google.gson.JsonObject;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
+import models.Recording;
+import models.RecordingCollection;
 import util.DateUtil;
 import util.Validator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.Date;
 import java.util.Map;
@@ -27,7 +26,7 @@ public class RecordingComponent {
             .create();
     }
 
-    public JsonObject list(String userId, Map<String, Object> params) throws InvalidComponentException {
+    public RecordingCollection list(String userId, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("userId", userId);
 
@@ -43,18 +42,18 @@ public class RecordingComponent {
 
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/" + userId + "/recordings", params);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), RecordingCollection.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject get(String meetingId, Map<String, Object> params) throws InvalidComponentException {
+    public Recording get(String meetingId, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("meetingId", meetingId);
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/meeting/" + meetingId + "/recordings", params);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), Recording.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }

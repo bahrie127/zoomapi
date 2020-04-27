@@ -2,13 +2,40 @@ package models;
 
 import java.util.List;
 
-public class WebinarPage {
+public class MeetingReportCollection {
 
+    private String from;
+    private String to;
+    private String nextPageToken;
     private int pageCount;
     private int pageNumber;
     private int pageSize;
     private int totalRecords;
-    private List<Webinar> webinars;
+    private List<MeetingReport> meetings;
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public String getNextPageToken() {
+        return nextPageToken;
+    }
+
+    public void setNextPageToken(String nextPageToken) {
+        this.nextPageToken = nextPageToken;
+    }
 
     public int getPageCount() {
         return pageCount;
@@ -42,11 +69,11 @@ public class WebinarPage {
         this.totalRecords = totalRecords;
     }
 
-    public List<Webinar> getWebinars() {
-        return webinars;
+    public List<MeetingReport> getMeetings() {
+        return meetings;
     }
 
-    public void setWebinars(List<Webinar> webinars) {
-        this.webinars = webinars;
+    public void setMeetings(List<MeetingReport> meetings) {
+        this.meetings = meetings;
     }
 }

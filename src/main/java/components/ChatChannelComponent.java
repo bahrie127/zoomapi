@@ -10,8 +10,6 @@ import exceptions.InvalidRequestException;
 import models.*;
 import util.Validator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,11 +26,11 @@ public class ChatChannelComponent {
             .create();
     }
 
-    public ChannelPage listChannels(Map<String, Object> params) throws InvalidComponentException {
+    public ChannelCollection listChannels(Map<String, Object> params) throws InvalidComponentException {
         try {
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/chat/users/me/channels", params);
 
-            return gson.fromJson(response.body().toString(), ChannelPage.class);
+            return gson.fromJson(response.body().toString(), ChannelCollection.class);
         } catch (InterruptedException | InvalidRequestException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
@@ -102,12 +100,12 @@ public class ChatChannelComponent {
         }
     }
 
-    public ChannelMemberPage listMembers(String channelId, Map<String, Object> params) throws InvalidComponentException {
+    public ChannelMemberCollection listMembers(String channelId, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("channelId", channelId);
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/chat/channels/" + channelId +"/members", params);
 
-            return gson.fromJson(response.body().toString(), ChannelMemberPage.class);
+            return gson.fromJson(response.body().toString(), ChannelMemberCollection.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }

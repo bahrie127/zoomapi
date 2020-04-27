@@ -2,7 +2,7 @@ package models;
 
 import java.util.List;
 
-public class UserPage {
+public class UserCollection {
 
     private int pageCount;
     private int pageNumber;

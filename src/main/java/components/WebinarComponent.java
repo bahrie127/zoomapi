@@ -4,14 +4,14 @@ import api.ApiClient;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
+import models.Webinar;
+import models.WebinarCollection;
+import models.WebinarRegistrant;
 import util.Validator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,77 +26,71 @@ public class WebinarComponent {
             .create();
     }
 
-    public JsonObject list(String userId, Map<String, Object> params) throws InvalidComponentException {
+    public WebinarCollection list(String userId, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("userId", userId);
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/"+userId+"/webinars", params);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), WebinarCollection.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject create(String userId, Map<String, Object> params, Map<String, Object> data) throws InvalidComponentException {
+    public Webinar create(String userId, Map<String, Object> params, Map<String, Object> data) throws InvalidComponentException {
         try {
             Validator.validateString("userId", userId);
             HttpResponse response = ApiClient.getThrottledInstance().postRequest("/users/"+userId+"/webinars", params, data);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), Webinar.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject update(String id, Map<String, Object> data) throws InvalidComponentException {
+    public void update(String id, Map<String, Object> data) throws InvalidComponentException {
         try {
             Validator.validateString("id", id);
-            HttpResponse response = ApiClient.getThrottledInstance().patchRequest("/webinars/"+id, data);
-
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            ApiClient.getThrottledInstance().patchRequest("/webinars/"+id, data);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject delete(String id) throws InvalidComponentException {
+    public void delete(String id) throws InvalidComponentException {
         try {
             Validator.validateString("id", id);
-            HttpResponse response = ApiClient.getThrottledInstance().deleteRequest("/webinars/"+id);
-
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            ApiClient.getThrottledInstance().deleteRequest("/webinars/"+id);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject end(String id) throws InvalidComponentException {
+    public void end(String id) throws InvalidComponentException {
         try {
             Validator.validateString("id", id);
 
             Map<String, Object> params = new HashMap<>();
             params.put("status", "end");
 
-            HttpResponse response = ApiClient.getThrottledInstance().putRequest("/webinars/" + id + "/status", null);
-
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            ApiClient.getThrottledInstance().putRequest("/webinars/" + id + "/status", null);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject get(String id, Map<String, Object> params) throws InvalidComponentException {
+    public Webinar get(String id, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("id", id);
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/webinars/"+ id, params);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), Webinar.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject register(String id, String email, String firstName, String lastName, Map<String, Object> params, Map<String, Object> data) throws InvalidComponentException {
+    public WebinarRegistrant register(String id, String email, String firstName, String lastName, Map<String, Object> params, Map<String, Object> data) throws InvalidComponentException {
         try {
             Validator.validateString("id",id);
             Validator.validateString("email",email);
@@ -105,7 +99,7 @@ public class WebinarComponent {
 
             HttpResponse response = ApiClient.getThrottledInstance().postRequest("/webinars/"+id+"/registrants", params, data);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), WebinarRegistrant.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }

@@ -8,6 +8,8 @@ import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
+import models.AccountReportCollection;
+import models.MeetingReportCollection;
 import util.DateUtil;
 import util.Validator;
 
@@ -26,7 +28,7 @@ public class ReportComponent {
             .create();
     }
 
-    public JsonObject getUserReport(String userId, Map<String, Object> params) throws InvalidComponentException {
+    public MeetingReportCollection getUserReport(String userId, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("userId", userId);
 
@@ -42,13 +44,13 @@ public class ReportComponent {
 
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("report/users/" + userId + "/meetings", params);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), MeetingReportCollection.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
     }
 
-    public JsonObject getAccountReport(Map<String, Object>params) throws InvalidComponentException {
+    public AccountReportCollection getAccountReport(Map<String, Object>params) throws InvalidComponentException {
         try {
             if (params.containsKey("start")) {
                 params.put("from", DateUtil.dateToString((Date) params.get("start")));
@@ -62,7 +64,7 @@ public class ReportComponent {
 
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("report/users", params);
 
-            return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), AccountReportCollection.class);
         } catch (InterruptedException | InvalidRequestException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }

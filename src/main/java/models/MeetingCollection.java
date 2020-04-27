@@ -2,12 +2,12 @@ package models;
 
 import java.util.List;
 
-public class ChannelPage {
+public class MeetingCollection {
 
     private int totalRecords;
     private int pageSize;
     private String nextPageToken;
-    private List<Channel> channels;
+    private List<Meeting> meetings;
 
     public int getTotalRecords() {
         return totalRecords;
@@ -33,11 +33,11 @@ public class ChannelPage {
         this.nextPageToken = nextPageToken;
     }
 
-    public List<Channel> getChannels() {
-        return channels;
+    public List<Meeting> getMeetings() {
+        return meetings;
     }
 
-    public void setChannels(List<Channel> channels) {
-        this.channels = channels;
+    public void setMeetings(List<Meeting> meetings) {
+        this.meetings = meetings;
     }
 }

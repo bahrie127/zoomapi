@@ -7,13 +7,10 @@ import com.google.gson.GsonBuilder;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
-import models.ChannelMemberPage;
-import models.MessagePage;
+import models.MessageCollection;
 import models.SentMessage;
 import util.Validator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +27,7 @@ public class ChatMessageComponent {
             .create();
     }
 
-    public MessagePage listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InvalidComponentException {
+    public MessageCollection listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("userId", userId);
             Validator.validateString("to", to);
@@ -42,7 +39,7 @@ public class ChatMessageComponent {
             params.put(toRecipientType(recipientType), to);
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/chat/users/" + userId + "/messages", params);
 
-            return gson.fromJson(response.body().toString(), MessagePage.class);
+            return gson.fromJson(response.body().toString(), MessageCollection.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }

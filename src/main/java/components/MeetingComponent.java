@@ -8,12 +8,10 @@ import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
 import models.Meeting;
-import models.MeetingPage;
+import models.MeetingCollection;
 import util.DateUtil;
 import util.Validator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.Date;
 import java.util.Map;
@@ -28,11 +26,11 @@ public class MeetingComponent {
             .create();
     }
 
-    public MeetingPage list(String userId, Map<String, Object> params) throws InvalidComponentException {
+    public MeetingCollection list(String userId, Map<String, Object> params) throws InvalidComponentException {
         try {
             Validator.validateString("userId", userId);
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/"+userId+"/meetings", params);
-            return gson.fromJson(response.body().toString(), MeetingPage.class);
+            return gson.fromJson(response.body().toString(), MeetingCollection.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }

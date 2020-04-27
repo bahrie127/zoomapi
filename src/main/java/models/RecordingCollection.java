@@ -2,7 +2,7 @@ package models;
 
 import java.util.List;
 
-public class RecordingPage {
+public class RecordingCollection {
 
     private String to;
     private String from;

@@ -4,16 +4,13 @@ import api.ApiClient;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
 import models.User;
-import models.UserPage;
+import models.UserCollection;
 import util.Validator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.util.Map;
 
@@ -27,11 +24,11 @@ public class UserComponent {
             .create();
     }
 
-    public UserPage listUsers(Map<String, Object> params) throws InvalidComponentException {
+    public UserCollection listUsers(Map<String, Object> params) throws InvalidComponentException {
         try {
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/user/list", params);
 
-            return gson.fromJson(response.body().toString(), UserPage.class);
+            return gson.fromJson(response.body().toString(), UserCollection.class);
         } catch (InterruptedException | InvalidRequestException exception) {
             throw new InvalidComponentException(exception.getMessage());
         }
