@@ -6,6 +6,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
+import exceptions.InvalidComponentException;
+import exceptions.InvalidRequestException;
+import models.User;
+import models.UserPage;
 import util.Validator;
 
 import java.io.IOException;
@@ -23,43 +27,52 @@ public class UserComponent {
             .create();
     }
 
-    public JsonObject listUsers(Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException {
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/user/list", params);
+    public UserPage listUsers(Map<String, Object> params) throws InvalidComponentException {
+        try {
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("/user/list", params);
 
-        return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), UserPage.class);
+        } catch (InterruptedException | InvalidRequestException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 
-    public JsonObject createUser(Map<String, Object> params,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException {
-        HttpResponse response = ApiClient.getThrottledInstance().postRequest("/users", params, data);
+    public User createUser(Map<String, Object> params, Map<String, Object> data) throws InvalidComponentException {
+        try {
+            HttpResponse response = ApiClient.getThrottledInstance().postRequest("/users", params, data);
 
-        return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), User.class);
+        } catch (InterruptedException | InvalidRequestException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 
-    public JsonObject updateUser(String id,  Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("id", id);
-        HttpResponse response = ApiClient.getThrottledInstance().patchRequest("/users/"+id, data);
-
-        return gson.fromJson(response.body().toString(), JsonObject.class);
+    public void updateUser(String id,  Map<String, Object> data) throws InvalidComponentException {
+        try {
+            Validator.validateString("id", id);
+            ApiClient.getThrottledInstance().patchRequest("/users/"+id, data);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 
-    public JsonObject deleteUser(String id) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("id", id);
-        HttpResponse response = ApiClient.getThrottledInstance().deleteRequest("/users/"+id);
-
-        return gson.fromJson(response.body().toString(), JsonObject.class);
+    public void deleteUser(String id) throws InvalidComponentException {
+        try {
+            Validator.validateString("id", id);
+            ApiClient.getThrottledInstance().deleteRequest("/users/"+id);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 
-    public JsonObject get(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("id", id);
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/"+id, params);
+    public User get(String id, Map<String, Object> params) throws InvalidComponentException {
+        try {
+            Validator.validateString("id", id);
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/"+id, params);
 
-        return gson.fromJson(response.body().toString(), JsonObject.class);
-    }
-
-    public JsonObject getPermissions(String userId) throws InvalidArgumentException, InterruptedException, IOException, URISyntaxException {
-        Validator.validateString("userId", userId);
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/" + userId + "/permissions");
-
-        return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), User.class);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 }

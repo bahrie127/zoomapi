@@ -6,11 +6,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
+import exceptions.InvalidComponentException;
+import exceptions.InvalidRequestException;
 import util.DateUtil;
 import util.Validator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+
 import java.net.http.HttpResponse;
 import java.util.Date;
 import java.util.Map;
@@ -25,38 +26,45 @@ public class ReportComponent {
             .create();
     }
 
-    public JsonObject getUserReport(String userId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("userId", userId);
+    public JsonObject getUserReport(String userId, Map<String, Object> params) throws InvalidComponentException {
+        try {
+            Validator.validateString("userId", userId);
 
-        if (params.containsKey("start")) {
-            params.put("from", DateUtil.dateToString((Date) params.get("start")));
-            params.remove("start");
+            if (params.containsKey("start")) {
+                params.put("from", DateUtil.dateToString((Date) params.get("start")));
+                params.remove("start");
+            }
+
+            if (params.containsKey("end")) {
+                params.put("to", DateUtil.dateToString((Date) params.get("end")));
+                params.remove("end");
+            }
+
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("report/users/" + userId + "/meetings", params);
+
+            return gson.fromJson(response.body().toString(), JsonObject.class);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
         }
-
-        if (params.containsKey("end")) {
-            params.put("to", DateUtil.dateToString((Date) params.get("end")));
-            params.remove("end");
-        }
-
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("report/users/" + userId + "/meetings", params);
-
-        return gson.fromJson(response.body().toString(), JsonObject.class);
     }
 
-    public JsonObject getAccountReport(Map<String, Object>params) throws InterruptedException, IOException, URISyntaxException {
+    public JsonObject getAccountReport(Map<String, Object>params) throws InvalidComponentException {
+        try {
+            if (params.containsKey("start")) {
+                params.put("from", DateUtil.dateToString((Date) params.get("start")));
+                params.remove("start");
+            }
 
-        if (params.containsKey("start")) {
-            params.put("from", DateUtil.dateToString((Date) params.get("start")));
-            params.remove("start");
+            if (params.containsKey("end")) {
+                params.put("to", DateUtil.dateToString((Date) params.get("end")));
+                params.remove("end");
+            }
+
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("report/users", params);
+
+            return gson.fromJson(response.body().toString(), JsonObject.class);
+        } catch (InterruptedException | InvalidRequestException exception) {
+            throw new InvalidComponentException(exception.getMessage());
         }
-
-        if (params.containsKey("end")) {
-            params.put("to", DateUtil.dateToString((Date) params.get("end")));
-            params.remove("end");
-        }
-
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("report/users", params);
-
-        return gson.fromJson(response.body().toString(), JsonObject.class);
     }
 }

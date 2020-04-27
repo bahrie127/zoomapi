@@ -3,6 +3,7 @@ package services;
 import components.ChatChannelComponent;
 import components.ChatMessageComponent;
 import exceptions.InvalidArgumentException;
+import exceptions.InvalidComponentException;
 import interfaces.MessageInterface;
 import models.*;
 
@@ -20,12 +21,12 @@ public class ChatService {
         this.chatMessages = new ChatMessageComponent();
     }
 
-    public void sendMessage(String channelName, String message) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
+    public void sendMessage(String channelName, String message) throws InvalidComponentException {
         Channel currentChannel = findByChannelName(channelName);
         chatMessages.postMessage(message, currentChannel.getId(), 1);
     }
 
-    private Channel findByChannelName(String channelName) throws InterruptedException, IOException, URISyntaxException {
+    private Channel findByChannelName(String channelName) throws InvalidComponentException {
         ChannelPage channelPage = chatChannels.listChannels(null);;
 
         for(Channel channel: channelPage.getChannels()) {
@@ -36,33 +37,30 @@ public class ChatService {
         return null;
     }
 
-    public List<Message> history(String channelName) {
+    public List<Message> history(String channelName) throws InvalidComponentException {
         List<Message> messageHistory = new ArrayList<>();
-        try {
-            Channel channel = findByChannelName(channelName);
-            if (channel != null) {
-                ChannelMemberPage channelMembers = chatChannels.listMembers(channel.getId(), null);
+        Channel channel = findByChannelName(channelName);
+        if (channel != null) {
+            ChannelMemberPage channelMembers = chatChannels.listMembers(channel.getId(), null);
 
-                if (channelMembers != null) {
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("date", "2010-01-01");
-                    params.put("page_size", 50);
+            if (channelMembers != null) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("date", "2010-01-01");
+                params.put("page_size", 50);
 
-                    for (ChannelMember member : channelMembers.getMembers()) {
-                        MessagePage memberMessages = chatMessages.listMessages(member.getId(), channel.getId(), 1, params);
-                        messageHistory.addAll(memberMessages.getMessages());
-                    }
+                for (ChannelMember member : channelMembers.getMembers()) {
+                    MessagePage memberMessages = chatMessages.listMessages(member.getId(), channel.getId(), 1, params);
+                    messageHistory.addAll(memberMessages.getMessages());
                 }
-
-                Collections.sort(messageHistory, (Message message1, Message message2) -> message1.getDateTime().compareTo(message1.getDateTime()));
             }
 
-        } catch(InterruptedException | IOException | URISyntaxException | InvalidArgumentException exception) { }
+            Collections.sort(messageHistory, (Message message1, Message message2) -> message1.getDateTime().compareTo(message1.getDateTime()));
+        }
 
         return messageHistory;
     }
 
-    public List<Message> search(String channelName, MessageInterface condition) {
+    public List<Message> search(String channelName, MessageInterface condition) throws InvalidComponentException {
         List<Message> messages = new ArrayList<>();
         List<Message> messageHistory = history(channelName);
 

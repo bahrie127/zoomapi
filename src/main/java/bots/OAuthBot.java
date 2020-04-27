@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import exceptions.InvalidArgumentException;
+import exceptions.InvalidComponentException;
 import models.Channel;
 import models.SentMessage;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
@@ -22,7 +23,7 @@ public class OAuthBot {
 
     private static final String SECTION_NAME = "OAuth";
 
-    public static void main(String[] args) throws IOException, UnirestException, OAuthProblemException, OAuthSystemException, URISyntaxException, InterruptedException, InvalidArgumentException {
+    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidComponentException {
         Wini ini = new Wini(new File(OAuthBot.class.getClassLoader().getResource("bot.ini").getFile()));
 
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);

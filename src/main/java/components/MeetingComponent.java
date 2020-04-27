@@ -5,6 +5,9 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptions.InvalidArgumentException;
+import exceptions.InvalidComponentException;
+import exceptions.InvalidRequestException;
+import models.Meeting;
 import models.MeetingPage;
 import util.DateUtil;
 import util.Validator;
@@ -25,43 +28,63 @@ public class MeetingComponent {
             .create();
     }
 
-    public MeetingPage list(String userId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("userId", userId);
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/"+userId+"/meetings", params);
-        return gson.fromJson(response.body().toString(), MeetingPage.class);
-    }
-
-    public MeetingComponent create(String userID, Map<String, Object> params, Map<String, Object> data) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("userId", userID);
-
-        if(params.get("start_time") != null) {
-            params.put("start_time", DateUtil.dateToString((Date) params.get("start_time")));
+    public MeetingPage list(String userId, Map<String, Object> params) throws InvalidComponentException {
+        try {
+            Validator.validateString("userId", userId);
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/"+userId+"/meetings", params);
+            return gson.fromJson(response.body().toString(), MeetingPage.class);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
         }
-
-        HttpResponse response = ApiClient.getThrottledInstance().postRequest("/users/"+userID+"/meetings", params, data);
-
-        return gson.fromJson(response.body().toString(), MeetingComponent.class);
     }
 
-    public MeetingComponent get(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("id", id);
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/meetings/"+id, params);
+    public Meeting create(String userID, Map<String, Object> params, Map<String, Object> data) throws InvalidComponentException {
+        try {
+            Validator.validateString("userId", userID);
 
-        return gson.fromJson(response.body().toString(), MeetingComponent.class);
-    }
+            if(params.get("start_time") != null) {
+                params.put("start_time", DateUtil.dateToString((Date) params.get("start_time")));
+            }
 
-    public void update(String id, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("id", id);
+            HttpResponse response = ApiClient.getThrottledInstance().postRequest("/users/"+userID+"/meetings", params, data);
 
-        if(params.get("start_time") != null) {
-            params.put("start_time", DateUtil.dateToString((Date) params.get("start_time")));
+            return gson.fromJson(response.body().toString(), Meeting.class);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
         }
-
-        ApiClient.getThrottledInstance().patchRequest("/meetings/"+id, params);
     }
 
-    public void delete(String id) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("id", id);
-        ApiClient.getThrottledInstance().deleteRequest("/meetings/"+id);
+    public Meeting get(String id, Map<String, Object> params) throws InvalidComponentException {
+        try {
+            Validator.validateString("id", id);
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("/meetings/"+id, params);
+
+            return gson.fromJson(response.body().toString(), Meeting.class);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
+    }
+
+    public void update(String id, Map<String, Object> params) throws InvalidComponentException {
+        try {
+            Validator.validateString("id", id);
+
+            if(params.get("start_time") != null) {
+                params.put("start_time", DateUtil.dateToString((Date) params.get("start_time")));
+            }
+
+            ApiClient.getThrottledInstance().patchRequest("/meetings/"+id, params);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
+    }
+
+    public void delete(String id) throws InvalidComponentException {
+        try {
+            Validator.validateString("id", id);
+            ApiClient.getThrottledInstance().deleteRequest("/meetings/"+id);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 }

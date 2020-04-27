@@ -1,7 +1,7 @@
 package api;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import exceptions.InvalidRequestException;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.io.IOException;
@@ -52,20 +52,22 @@ public class ApiClient {
      *
      * @param endpoint Path URL
      * @return HttpResponse
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws URISyntaxException
+     * @throws InvalidRequestException
      */
-    public HttpResponse getRequest(String endpoint) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse getRequest(String endpoint) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(urlFor(endpoint)))
-            .timeout(Duration.ofSeconds(this.timeout))
-            .setHeader("Authorization", "Bearer " + this.token)
-            .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(urlFor(endpoint)))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException exception) {
+            throw new InvalidRequestException(exception.getMessage());
+        }
     }
 
     /**
@@ -74,28 +76,30 @@ public class ApiClient {
      * @param endpoint Path URL
      * @param params Query parameters
      * @return HttpResponse
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws URISyntaxException
+     * @throws InvalidRequestException
      */
-    public HttpResponse getRequest(String endpoint, Map<String, Object> params) throws IOException, InterruptedException, URISyntaxException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse getRequest(String endpoint, Map<String, Object> params) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
-        if (params != null) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                uriBuilder.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
+            URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
+            if (params != null) {
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    uriBuilder.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
+                }
             }
+
+            System.out.println(uriBuilder.toString());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uriBuilder.toString()))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .build();
+
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException | URISyntaxException exception) {
+            throw new InvalidRequestException(exception.getMessage());
         }
-
-        System.out.println(uriBuilder.toString());
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uriBuilder.toString()))
-                .timeout(Duration.ofSeconds(this.timeout))
-                .setHeader("Authorization", "Bearer " + this.token)
-                .build();
-
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -105,29 +109,31 @@ public class ApiClient {
      * @param params Query parameters
      * @param data Request body
      * @return HttpResponse
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws InvalidRequestException
      */
-    public HttpResponse postRequest(String endpoint, Map<String, Object> params, Map<String, Object> data) throws URISyntaxException, IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse postRequest(String endpoint, Map<String, Object> params, Map<String, Object> data) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
-        if (params != null) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                uriBuilder.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
+            URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
+            if (params != null) {
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    uriBuilder.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
+                }
             }
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uriBuilder.toString()))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .setHeader("Content-type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
+                    .build();
+
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException | URISyntaxException exception) {
+            throw new InvalidRequestException(exception.getMessage());
         }
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uriBuilder.toString()))
-                .timeout(Duration.ofSeconds(this.timeout))
-                .setHeader("Authorization", "Bearer " + this.token)
-                .setHeader("Content-type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
-                .build();
-
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -135,22 +141,24 @@ public class ApiClient {
      *
      * @param endpoint Path URL
      * @return HttpResponse
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws InvalidRequestException
      */
-    public HttpResponse postRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse postRequest(String endpoint, Map<String, Object> data) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlFor(endpoint)))
-                .timeout(Duration.ofSeconds(this.timeout))
-                .setHeader("Authorization", "Bearer " + this.token)
-                .setHeader("Content-type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
-                .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(urlFor(endpoint)))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .setHeader("Content-type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
+                    .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException exception) {
+            throw new InvalidRequestException(exception.getMessage());
+        }
     }
 
     /**
@@ -159,22 +167,24 @@ public class ApiClient {
      * @param endpoint Path URL
      * @param data Request body
      * @return HttpResponse
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws InvalidRequestException
      */
-    public HttpResponse putRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse putRequest(String endpoint, Map<String, Object> data) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlFor(endpoint)))
-                .timeout(Duration.ofSeconds(this.timeout))
-                .setHeader("Authorization", "Bearer " + this.token)
-                .setHeader("Content-type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
-                .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(urlFor(endpoint)))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .setHeader("Content-type", "application/json")
+                    .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
+                    .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException exception) {
+            throw new InvalidRequestException(exception.getMessage());
+        }
     }
 
     /**
@@ -182,22 +192,24 @@ public class ApiClient {
      *
      * @param endpoint Path URL
      * @return HttpResponse
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws InvalidRequestException
      */
-    public HttpResponse deleteRequest(String endpoint) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse deleteRequest(String endpoint) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlFor(endpoint)))
-                .timeout(Duration.ofSeconds(this.timeout))
-                .setHeader("Authorization", "Bearer " + this.token)
-                .setHeader("Content-type", "application/json")
-                .DELETE()
-                .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(urlFor(endpoint)))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .setHeader("Content-type", "application/json")
+                    .DELETE()
+                    .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException exception) {
+            throw new InvalidRequestException(exception.getMessage());
+        }
     }
 
     /**
@@ -206,29 +218,31 @@ public class ApiClient {
      * @param endpoint Path URL
      * @param params Query parameters
      * @return HttpResponse
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws InvalidRequestException
      */
-    public HttpResponse deleteRequest(String endpoint, Map<String, Object> params) throws IOException, InterruptedException, URISyntaxException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse deleteRequest(String endpoint, Map<String, Object> params) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
-        if (params != null) {
-            for (Map.Entry<String, Object> entry : params.entrySet()) {
-                uriBuilder.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
+            URIBuilder uriBuilder = new URIBuilder(urlFor(endpoint));
+            if (params != null) {
+                for (Map.Entry<String, Object> entry : params.entrySet()) {
+                    uriBuilder.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
+                }
             }
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(uriBuilder.toString()))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .setHeader("Content-type", "application/json")
+                    .DELETE()
+                    .build();
+
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException | URISyntaxException exception) {
+            throw new InvalidRequestException(exception.getMessage());
         }
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(uriBuilder.toString()))
-                .timeout(Duration.ofSeconds(this.timeout))
-                .setHeader("Authorization", "Bearer " + this.token)
-                .setHeader("Content-type", "application/json")
-                .DELETE()
-                .build();
-
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     /**
@@ -237,22 +251,24 @@ public class ApiClient {
      * @param endpoint Path URL
      * @param data Request body
      * @return HttpResponse
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws InvalidRequestException
      */
-    public HttpResponse patchRequest(String endpoint, Map<String, Object> data) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+    public HttpResponse patchRequest(String endpoint, Map<String, Object> data) throws InvalidRequestException {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(urlFor(endpoint)))
-                .timeout(Duration.ofSeconds(this.timeout))
-                .setHeader("Authorization", "Bearer " + this.token)
-                .setHeader("Content-type", "application/json")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
-                .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(urlFor(endpoint)))
+                    .timeout(Duration.ofSeconds(this.timeout))
+                    .setHeader("Authorization", "Bearer " + this.token)
+                    .setHeader("Content-type", "application/json")
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(gson.toJson(data)))
+                    .build();
 
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException exception) {
+            throw new InvalidRequestException(exception.getMessage());
+        }
     }
 
     public void setToken(String token) {

@@ -6,6 +6,8 @@ import com.google.gson.GsonBuilder;
 import exceptions.InvalidArgumentException;
 import api.ApiClient;
 import com.google.gson.JsonObject;
+import exceptions.InvalidComponentException;
+import exceptions.InvalidRequestException;
 import util.DateUtil;
 import util.Validator;
 
@@ -25,33 +27,45 @@ public class RecordingComponent {
             .create();
     }
 
-    public JsonObject list(String userId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("userId", userId);
+    public JsonObject list(String userId, Map<String, Object> params) throws InvalidComponentException {
+        try {
+            Validator.validateString("userId", userId);
 
-        if (params.containsKey("start")) {
-            params.put("from", DateUtil.dateToString((Date) params.get("start")));
-            params.remove("start");
+            if (params.containsKey("start")) {
+                params.put("from", DateUtil.dateToString((Date) params.get("start")));
+                params.remove("start");
+            }
+
+            if (params.containsKey("end")) {
+                params.put("to", DateUtil.dateToString((Date) params.get("end")));
+                params.remove("end");
+            }
+
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/" + userId + "/recordings", params);
+
+            return gson.fromJson(response.body().toString(), JsonObject.class);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
         }
-
-        if (params.containsKey("end")) {
-            params.put("to", DateUtil.dateToString((Date) params.get("end")));
-            params.remove("end");
-        }
-
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/users/" + userId + "/recordings", params);
-
-        return gson.fromJson(response.body().toString(), JsonObject.class);
     }
 
-    public JsonObject get(String meetingId, Map<String, Object> params) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("meetingId", meetingId);
-        HttpResponse response = ApiClient.getThrottledInstance().getRequest("/meeting/" + meetingId + "/recordings", params);
+    public JsonObject get(String meetingId, Map<String, Object> params) throws InvalidComponentException {
+        try {
+            Validator.validateString("meetingId", meetingId);
+            HttpResponse response = ApiClient.getThrottledInstance().getRequest("/meeting/" + meetingId + "/recordings", params);
 
-        return gson.fromJson(response.body().toString(), JsonObject.class);
+            return gson.fromJson(response.body().toString(), JsonObject.class);
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 
-    public void delete(String meetingId) throws InterruptedException, IOException, URISyntaxException, InvalidArgumentException {
-        Validator.validateString("meetingId", meetingId);
-        ApiClient.getThrottledInstance().deleteRequest("/meeting/" + meetingId + "/recordings");
+    public void delete(String meetingId) throws InvalidComponentException {
+        try {
+            Validator.validateString("meetingId", meetingId);
+            ApiClient.getThrottledInstance().deleteRequest("/meeting/" + meetingId + "/recordings");
+        } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
+            throw new InvalidComponentException(exception.getMessage());
+        }
     }
 }

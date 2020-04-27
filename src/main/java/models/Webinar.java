@@ -1,6 +1,6 @@
 package models;
 
-public class WebinarFile {
+public class Webinar {
 
     private String Uuid;
     private int id;

@@ -8,7 +8,7 @@ public class WebinarPage {
     private int pageNumber;
     private int pageSize;
     private int totalRecords;
-    private List<WebinarFile> webinars;
+    private List<Webinar> webinars;
 
     public int getPageCount() {
         return pageCount;
@@ -42,11 +42,11 @@ public class WebinarPage {
         this.totalRecords = totalRecords;
     }
 
-    public List<WebinarFile> getWebinars() {
+    public List<Webinar> getWebinars() {
         return webinars;
     }
 
-    public void setWebinars(List<WebinarFile> webinars) {
+    public void setWebinars(List<Webinar> webinars) {
         this.webinars = webinars;
     }
 }

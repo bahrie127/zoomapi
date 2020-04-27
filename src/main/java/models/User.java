@@ -1,6 +1,6 @@
 package models;
 
-public class UserFile {
+public class User {
 
     private String id;
     private String firstName;

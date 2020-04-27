@@ -8,7 +8,7 @@ public class UserPage {
     private int pageNumber;
     private int pageSize;
     private int totalRecords;
-    private List<UserFile> user;
+    private List<User> user;
 
     public int getPageCount() {
         return pageCount;
@@ -42,11 +42,11 @@ public class UserPage {
         this.totalRecords = totalRecords;
     }
 
-    public List<UserFile> getUser() {
+    public List<User> getUser() {
         return user;
     }
 
-    public void setUser(List<UserFile> user) {
+    public void setUser(List<User> user) {
         this.user = user;
     }
 }
