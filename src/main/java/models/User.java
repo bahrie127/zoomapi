@@ -8,7 +8,7 @@ public class User {
     private String email;
     private int type;
     private String status;
-    private int pmi;
+    private long pmi;
     private String timezone;
     private String dept;
     private String createdAt;
@@ -64,11 +64,11 @@ public class User {
         this.status = status;
     }
 
-    public int getPmi() {
+    public long getPmi() {
         return pmi;
     }
 
-    public void setPmi(int pmi) {
+    public void setPmi(long pmi) {
         this.pmi = pmi;
     }
 

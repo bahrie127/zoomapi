@@ -29,11 +29,12 @@ public class ServiceBot {
 
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
+        tunnel.close();
+
         client.getChat().sendMessage("test", "Hello this is a test message.");
         client.getChat().history("test");
         client.getChat().search("test", (message) -> message.getSender().contains("diva"));
         client.getChat().search("test", (message) -> message.getMessage().contains("hello"));
 
-        tunnel.close();
     }
 }

@@ -34,6 +34,7 @@ public class OAuthBot {
         String redirectUri = tunnel.url();
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
+        tunnel.close();
         Gson gson = new Gson();
 
         System.out.println("User");
@@ -101,7 +102,5 @@ public class OAuthBot {
 
         System.out.println("Deleted message");
         client.getChatMessages().deleteMessage(messageId, "rafael.bellotti@gmail.com", 0);
-
-        tunnel.close();
     }
 }

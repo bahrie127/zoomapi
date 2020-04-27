@@ -1,17 +1,15 @@
 package models;
 
-import java.util.List;
-
 public class InvitedChannelMembers {
 
-    private List<String> ids;
+    private String ids;
     private String addedAt;
 
-    public List<String> getIds() {
+    public String getIds() {
         return ids;
     }
 
-    public void setIds(List<String> ids) {
+    public void setIds(String ids) {
         this.ids = ids;
     }
 
