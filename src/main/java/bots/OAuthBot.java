@@ -3,9 +3,9 @@ package bots;
 import clients.OAuthClient;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
-import models.Channel;
-import models.SentMessage;
+import models.Message;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -13,14 +13,14 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.util.List;
 
 public class OAuthBot {
 
     private static final String SECTION_NAME = "OAuth";
 
-    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidComponentException {
+    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidComponentException, InvalidArgumentException {
         Wini ini = new Wini(new File(OAuthBot.class.getClassLoader().getResource("bot.ini").getFile()));
 
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);
@@ -29,75 +29,35 @@ public class OAuthBot {
 
         NgrokTunnel tunnel = new NgrokTunnel(4041);
         String redirectUri = tunnel.url();
+        System.out.println("Redirect url: " + redirectUri);
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
         tunnel.close();
+
         Gson gson = new Gson();
+        LocalDate fromDate = LocalDate.of(2020, 4, 25);
+        LocalDate toDate = LocalDate.of(2020, 4, 28);
 
-        System.out.println("User");
-        System.out.println(gson.toJson(client.getUser().get("me", null)));
-        System.out.println("----------");
+        client.getChat().sendMessage("test", "Hello this is a test message.");
+        List<Message> messageHistory = client.getChat().history("test", fromDate, toDate);
 
-        // Testing chat channels component
-        System.out.println("Creating channel");
-        Channel createChannelResponse = client.getChatChannels().createChannel("A Test Channel", 1, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
-        System.out.println(gson.toJson(createChannelResponse));
-        String channelId = createChannelResponse.getId();
-        System.out.println("----------");
+        System.out.println("Message history");
+        for (Message message : messageHistory) {
+            System.out.println(gson.toJson(message));
+        }
+        System.out.println("--------------------");
 
-        System.out.println("Getting channel information");
-        System.out.println(gson.toJson(client.getChatChannels().getChannel(channelId)));
-        System.out.println("----------");
+        System.out.println("Sender filtered messages:");
+        List<Message> senderFilteredMessages = client.getChat().search("test", fromDate, toDate, (message) -> message.getSender().contains("rafael"));
+        for (Message message : senderFilteredMessages) {
+            System.out.println(gson.toJson(message));
+        }
+        System.out.println("--------------------");
 
-        System.out.println("Listing channels");
-        System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
-        System.out.println("----------");
-
-        System.out.println("Listing channel members");
-        System.out.println(gson.toJson(client.getChatChannels().listMembers(channelId, null)));
-        System.out.println("----------");
-
-        System.out.println("Removing member from channel");
-        client.getChatChannels().removeMember(channelId, "4esghsytteeabljsq8vdrw");
-
-        System.out.println("Updating channel");
-        client.getChatChannels().updateChannel(channelId, "My New Channel");
-
-        System.out.println("Inviting member to channel");
-        System.out.println(gson.toJson(client.getChatChannels().inviteMembers(channelId, new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")))));
-        System.out.println("----------");
-
-        System.out.println("Creating channel for deletion");
-        Channel createChannelToBeDeletedResponse = client.getChatChannels().createChannel("To Be Deleted", 1, new ArrayList<>());
-        System.out.println(gson.toJson(createChannelToBeDeletedResponse));
-        String deletedChannelId = createChannelToBeDeletedResponse.getId();
-        System.out.println("----------");
-
-        System.out.println("Leaving channel");
-        client.getChatChannels().leaveChannel(channelId);
-
-        System.out.println("Joining channel");
-        System.out.println(gson.toJson(client.getChatChannels().joinChannel(channelId)));
-        System.out.println("----------");
-
-        System.out.println("Deleting channel");
-        client.getChatChannels().deleteChannel(deletedChannelId);
-
-        //Testing chat messages
-        System.out.println("Sending message");
-        SentMessage messageResponse = client.getChatMessages().postMessage("Hello!", "rafael.bellotti@gmail.com", 0);
-        System.out.println(gson.toJson(messageResponse));
-        String messageId = messageResponse.getId();
-        System.out.println("----------");
-
-        System.out.println("Listing messages");
-        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "rafael.bellotti@gmail.com", 0, null)));
-        System.out.println("----------");
-
-        System.out.println("Updated message");
-        client.getChatMessages().putMessage(messageId, "Changed message", "rafael.bellotti@gmail.com", 0);
-
-        System.out.println("Deleted message");
-        client.getChatMessages().deleteMessage(messageId, "rafael.bellotti@gmail.com", 0);
+        System.out.println("Message content filtered messages:");
+        List<Message> contentFilteredMessages = client.getChat().search("test", fromDate, toDate, (message) -> message.getMessage().contains("Hello"));
+        for (Message message: contentFilteredMessages) {
+            System.out.println(gson.toJson(message));
+        }
     }
 }
