@@ -1,17 +1,16 @@
 package services;
 
-import com.google.gson.Gson;
 import components.ChatChannelComponent;
 import components.ChatMessageComponent;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import interfaces.MessageInterface;
-import models.*;
-import util.DateUtil;
+import models.Channel;
+import models.ChannelCollection;
+import models.Message;
+import models.MessageCollection;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -121,6 +120,4 @@ public class ChatService {
             }
         }
     }
-
-
 }
