@@ -36,7 +36,7 @@ public class OAuthBot {
 
         Gson gson = new Gson();
 
-        client.getChatHandler().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
+        client.getChatListener().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
 
         /*LocalDate fromDate = LocalDate.of(2020, 4, 28);
         LocalDate toDate = LocalDate.of(2020, 4, 28);

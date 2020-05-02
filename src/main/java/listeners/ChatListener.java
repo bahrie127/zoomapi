@@ -1,27 +1,25 @@
-package handlers;
+package listeners;
 
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import interfaces.MemberCallbackInterface;
 import interfaces.MessageCallbackInterface;
-import interfaces.MessageInterface;
 import models.Message;
 import services.ChatService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ChatHandler {
+public class ChatListener {
 
     private ChatService chatService;
     private static final int CALL_RATE = 30;
 
-    public ChatHandler() {
+    public ChatListener() {
         this.chatService = new ChatService();
     }
 
