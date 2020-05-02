@@ -35,7 +35,10 @@ public class OAuthBot {
         tunnel.close();
 
         Gson gson = new Gson();
-        LocalDate fromDate = LocalDate.of(2020, 4, 28);
+
+        client.getChatHandler().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
+
+        /*LocalDate fromDate = LocalDate.of(2020, 4, 28);
         LocalDate toDate = LocalDate.of(2020, 4, 28);
 
         client.getChat().sendMessage("test", "Hello this is a test message.");
@@ -58,6 +61,6 @@ public class OAuthBot {
         List<Message> contentFilteredMessages = client.getChat().search("test", fromDate, toDate, (message) -> message.getMessage().contains("Hello"));
         for (Message message: contentFilteredMessages) {
             System.out.println(gson.toJson(message));
-        }
+        }*/
     }
 }

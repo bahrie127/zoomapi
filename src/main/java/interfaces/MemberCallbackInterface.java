@@ -2,6 +2,6 @@ package interfaces;
 
 import models.ChannelMember;
 
-public interface ChannelMemberInterface {
+public interface MemberCallbackInterface {
     void call(ChannelMember channelMember);
 }

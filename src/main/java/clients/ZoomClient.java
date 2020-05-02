@@ -2,6 +2,7 @@ package clients;
 
 import api.ApiClient;
 import components.*;
+import handlers.ChatHandler;
 import services.ChatService;
 
 public class ZoomClient {
@@ -17,6 +18,7 @@ public class ZoomClient {
     private ReportComponent report;
     private WebinarComponent webinar;
     private ChatService chat;
+    private ChatHandler chatHandler;
 
     public ZoomClient(String apiKey, String apiSecret, Integer timeout) throws InterruptedException {
         this.apiKey = apiKey;
@@ -34,6 +36,7 @@ public class ZoomClient {
         this.report = new ReportComponent();
         this.webinar = new WebinarComponent();
         this.chat = new ChatService();
+        this.chatHandler = new ChatHandler();
     }
 
     public void refreshToken() {}
@@ -90,5 +93,9 @@ public class ZoomClient {
 
     public ChatService getChat() {
         return chat;
+    }
+
+    public ChatHandler getChatHandler() {
+        return chatHandler;
     }
 }
