@@ -26,7 +26,7 @@ public class ChatService {
     }
 
     public void sendMessage(String channelName, String message) throws InvalidComponentException {
-        Channel currentChannel = findByChannelName(channelName);
+        Channel currentChannel = findByChannelName(channelName, null);
 
         if (currentChannel != null) {
             chatMessages.postMessage(message, currentChannel.getId(), 1);
@@ -43,7 +43,7 @@ public class ChatService {
         }
 
         List<Message> messageHistory = new ArrayList<>();
-        Channel channel = findByChannelName(channelName);
+        Channel channel = findByChannelName(channelName, null);
         if (channel != null) {
             for (LocalDate currentDate = fromDate; !currentDate.isAfter(toDate); currentDate = currentDate.plusDays(1)) {
                 getMessagesByDate("me", channel.getId(), 1, currentDate, null, messageHistory);
@@ -67,19 +67,7 @@ public class ChatService {
         return messages;
     }
 
-    private Channel findByChannelName(String channelName) throws InvalidComponentException {
-        List<Channel> channels = new ArrayList<>();
-        getChannels(null, channels);
-
-        for(Channel channel: channels) {
-            if(channel.getName().equals(channelName)) {
-                return channel;
-            }
-        }
-        return null;
-    }
-
-    private void getChannels(String nextPageToken, List<Channel> channels) throws InvalidComponentException {
+    private Channel findByChannelName(String channelName, String nextPageToken) throws InvalidComponentException {
         Map<String, Object> params = new HashMap<>();
         params.put("page_size", 50);
 
@@ -90,12 +78,19 @@ public class ChatService {
         ChannelCollection channelCollection = chatChannels.listChannels(params);;
 
         if (channelCollection.getTotalRecords() != 0) {
-            channels.addAll(channelCollection.getChannels());
+
+            for(Channel channel: channelCollection.getChannels()) {
+                if(channel.getName().equals(channelName)) {
+                    return channel;
+                }
+            }
 
             if (!channelCollection.getNextPageToken().isEmpty()) {
-                getChannels(channelCollection.getNextPageToken(), channels);
+                return findByChannelName(channelName, channelCollection.getNextPageToken());
             }
         }
+
+        return null;
     }
 
     private void getMessagesByDate(String memberId, String channelId, int recipientType, LocalDate date,

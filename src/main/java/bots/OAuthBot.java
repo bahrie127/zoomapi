@@ -37,30 +37,5 @@ public class OAuthBot {
         Gson gson = new Gson();
 
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
-
-        /*LocalDate fromDate = LocalDate.of(2020, 4, 28);
-        LocalDate toDate = LocalDate.of(2020, 4, 28);
-
-        client.getChat().sendMessage("test", "Hello this is a test message.");
-        List<Message> messageHistory = client.getChat().history("test", fromDate, toDate);
-
-        System.out.println("Message history");
-        for (Message message : messageHistory) {
-            System.out.println(gson.toJson(message));
-        }
-        System.out.println("--------------------");
-
-        System.out.println("Sender filtered messages:");
-        List<Message> senderFilteredMessages = client.getChat().search("test", fromDate, toDate, (message) -> message.getSender().contains("rafael"));
-        for (Message message : senderFilteredMessages) {
-            System.out.println(gson.toJson(message));
-        }
-        System.out.println("--------------------");
-
-        System.out.println("Message content filtered messages:");
-        List<Message> contentFilteredMessages = client.getChat().search("test", fromDate, toDate, (message) -> message.getMessage().contains("Hello"));
-        for (Message message: contentFilteredMessages) {
-            System.out.println(gson.toJson(message));
-        }*/
     }
 }
