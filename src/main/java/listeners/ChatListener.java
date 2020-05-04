@@ -4,6 +4,7 @@ import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import interfaces.MemberCallbackInterface;
 import interfaces.MessageCallbackInterface;
+import models.ChannelMember;
 import models.Message;
 import services.ChatService;
 
@@ -39,7 +40,7 @@ public class ChatListener {
 
                 for (Message retrievedMessage : retrievedMessages) {
                     int matchedMessageId = findMessageById(messages, retrievedMessage.getId());
-                    if (matchedMessageId == -1) { // if message doesnt exist, adds it to the list
+                    if (matchedMessageId == -1) { // if message doesnt exist locally, adds it to the list
                         messages.add(retrievedMessage);
                     } else if (!messages.get(matchedMessageId).getMessage().equals(retrievedMessage.getMessage())) { // if content of the message was changed
                         callback.call(retrievedMessage);
@@ -54,7 +55,28 @@ public class ChatListener {
     }
 
     public void onNewMember(String channelName, MemberCallbackInterface callback) {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
+        CopyOnWriteArrayList<ChannelMember> members = new CopyOnWriteArrayList<>();
+        executorService.scheduleAtFixedRate(() -> {
+            try {
+                List<ChannelMember> retrievedMembers = chatService.members(channelName);
+
+                if (members.isEmpty()) {
+                    members.addAll(retrievedMembers);
+                } else {
+                    for (ChannelMember retrievedMember : retrievedMembers) {
+                        if (!members.stream().filter(o -> o.getId().equals(retrievedMember.getId())).findFirst().isPresent()) {
+                            callback.call(retrievedMember);
+                            members.add(retrievedMember);
+                        }
+                    }
+                }
+
+            } catch (InvalidComponentException e) {
+                e.printStackTrace();
+            }
+        }, 0, CALL_RATE, TimeUnit.SECONDS);
     }
 
     private int findMessageById(CopyOnWriteArrayList<Message> messages, String messageId) {

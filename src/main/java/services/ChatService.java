@@ -5,10 +5,7 @@ import components.ChatMessageComponent;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import interfaces.MessageInterface;
-import models.Channel;
-import models.ChannelCollection;
-import models.Message;
-import models.MessageCollection;
+import models.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -17,19 +14,19 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ChatService {
 
-    private ChatChannelComponent chatChannels;
-    private ChatMessageComponent chatMessages;
+    private ChatChannelComponent chatChannel;
+    private ChatMessageComponent chatMessage;
 
     public ChatService() {
-        this.chatChannels = new ChatChannelComponent();
-        this.chatMessages = new ChatMessageComponent();
+        this.chatChannel = new ChatChannelComponent();
+        this.chatMessage = new ChatMessageComponent();
     }
 
     public void sendMessage(String channelName, String message) throws InvalidComponentException {
         Channel currentChannel = findByChannelName(channelName, null);
 
         if (currentChannel != null) {
-            chatMessages.postMessage(message, currentChannel.getId(), 1);
+            chatMessage.postMessage(message, currentChannel.getId(), 1);
         }
     }
 
@@ -67,6 +64,18 @@ public class ChatService {
         return messages;
     }
 
+    public List<ChannelMember> members(String channelName) throws InvalidComponentException {
+        Channel channel = findByChannelName(channelName, null);
+
+        if (channel != null) {
+            List<ChannelMember> members = new ArrayList<>();
+            getMembers(channel.getId(), null, members);
+
+            return members;
+        }
+        return null;
+    }
+
     private Channel findByChannelName(String channelName, String nextPageToken) throws InvalidComponentException {
         Map<String, Object> params = new HashMap<>();
         params.put("page_size", 50);
@@ -75,7 +84,7 @@ public class ChatService {
             params.put("next_page_token", nextPageToken);
         }
 
-        ChannelCollection channelCollection = chatChannels.listChannels(params);;
+        ChannelCollection channelCollection = chatChannel.listChannels(params);;
 
         if (channelCollection.getTotalRecords() != 0) {
 
@@ -105,7 +114,7 @@ public class ChatService {
             params.put("next_page_token", nextPageToken);
         }
 
-        MessageCollection collection = chatMessages.listMessages(memberId, channelId, recipientType, params);
+        MessageCollection collection = chatMessage.listMessages(memberId, channelId, recipientType, params);
 
         if (collection.getMessages() != null) {
             messages.addAll(collection.getMessages());
@@ -115,4 +124,24 @@ public class ChatService {
             }
         }
     }
+
+    private void getMembers(String channelId, String nextPageToken, List<ChannelMember> members) throws InvalidComponentException {
+        Map<String, Object> params = new HashMap<>();
+        params.put("page_size", 100);
+
+        if (nextPageToken != null) {
+            params.put("next_page_token", nextPageToken);
+        }
+
+        ChannelMemberCollection collection = chatChannel.listMembers(channelId, params);
+
+        if (collection.getMembers() != null) {
+            members.addAll(collection.getMembers());
+
+            if (!collection.getNextPageToken().isEmpty()) {
+                getMembers(channelId, collection.getNextPageToken(), members);
+            }
+        }
+    }
+
 }
