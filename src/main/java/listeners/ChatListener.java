@@ -9,18 +9,17 @@ import models.Message;
 import services.ChatService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-public class ChatListener {
+public class ChatListener extends Listener {
 
     private ChatService chatService;
-    private static final int CALL_RATE = 30;
 
     public ChatListener() {
+        super();
         this.chatService = new ChatService();
     }
 
@@ -31,8 +30,9 @@ public class ChatListener {
     public void onMessageUpdate(String channelName, MessageCallbackInterface callback) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-        CopyOnWriteArrayList<Message> messages = new CopyOnWriteArrayList<>();
-        executorService.scheduleAtFixedRate(() -> {
+        List<Message> messages = new ArrayList<>();
+
+        registerEvent(() -> {
             LocalDate toDate = LocalDate.now();
             LocalDate fromDate = toDate.minusDays(5);
             try {
@@ -51,35 +51,36 @@ public class ChatListener {
             } catch (InvalidComponentException | InvalidArgumentException exception) {
                 exception.printStackTrace();
             }
-        }, 0, CALL_RATE, TimeUnit.SECONDS);
+        });
     }
 
     public void onNewMember(String channelName, MemberCallbackInterface callback) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-        CopyOnWriteArrayList<ChannelMember> members = new CopyOnWriteArrayList<>();
-        executorService.scheduleAtFixedRate(() -> {
+        List<ChannelMember> members = new ArrayList<>();
+        registerEvent(() -> {
             try {
                 List<ChannelMember> retrievedMembers = chatService.members(channelName);
 
-                if (members.isEmpty()) {
-                    members.addAll(retrievedMembers);
-                } else {
+                if (!members.isEmpty()) {
                     for (ChannelMember retrievedMember : retrievedMembers) {
                         if (!members.stream().filter(o -> o.getId().equals(retrievedMember.getId())).findFirst().isPresent()) {
                             callback.call(retrievedMember);
-                            members.add(retrievedMember);
                         }
                     }
                 }
 
+                // this guarantees that if members are removed, if added again it will generate an event for that member
+                members.clear();
+                members.addAll(retrievedMembers);
+
             } catch (InvalidComponentException e) {
                 e.printStackTrace();
             }
-        }, 0, CALL_RATE, TimeUnit.SECONDS);
+        });
     }
 
-    private int findMessageById(CopyOnWriteArrayList<Message> messages, String messageId) {
+    private int findMessageById(List<Message> messages, String messageId) {
         for (int i = 0; i < messages.size(); i++) {
             if (messages.get(i).getId().equals(messageId)) {
                 return i;
