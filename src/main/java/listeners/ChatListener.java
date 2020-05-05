@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class ChatListener {
 
     private ChatService chatService;
-    private static final int CALL_RATE = 30;
+    private static final int CALL_RATE = 10;
 
     public ChatListener() {
         this.chatService = new ChatService();
@@ -30,24 +30,22 @@ public class ChatListener {
 
         CopyOnWriteArrayList<Message> messages = new CopyOnWriteArrayList<>();
         executorService.scheduleAtFixedRate(() -> {
-            LocalDate toDate = LocalDate.now();
-            LocalDate fromDate = toDate.minusDays(5);
 
             try {
-                List<Message> retrievedMessages = this.chatService.history(channelName, fromDate, toDate);
+                List<Message> retrievedMessages = this.chatService.history(channelName, LocalDate.now(), LocalDate.now());
                 Long latestTimeStamp = retrievedMessages.get(retrievedMessages.size() -1).getTimestamp();
 
-                for(Message retrievedMessage: retrievedMessages) {
+                if (messages.isEmpty()) {
+                    messages.addAll(retrievedMessages);
+                } else {
+                    for(Message retrievedMessage: retrievedMessages) {
 
-                    Long messageTimeStamp = retrievedMessage.getTimestamp();
+                        Long messageTimeStamp = retrievedMessage.getTimestamp();
 
-                    if(messageTimeStamp < latestTimeStamp) {
-                        messages.add(retrievedMessage);
-                    }
-                    else {
-                        callback.call(retrievedMessage);
-                        latestTimeStamp = messageTimeStamp;
-                        messages.add(retrievedMessage);
+                        if(latestTimeStamp <= messageTimeStamp) {
+                            callback.call(retrievedMessage);
+                            messages.add(retrievedMessage);
+                        }
                     }
                 }
 
