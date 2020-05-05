@@ -11,27 +11,57 @@ import services.ChatService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ChatListener extends Listener {
 
     private ChatService chatService;
+    private static final int CALL_RATE = 10;
 
     public ChatListener() {
         super();
         this.chatService = new ChatService();
     }
 
-    public void onNewMessage(String channelName, MessageCallbackInterface callback) {
 
+    public void onNewMessage(String channelName, MessageCallbackInterface callback) {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+        CopyOnWriteArrayList<Message> messages = new CopyOnWriteArrayList<>();
+        executorService.scheduleAtFixedRate(() -> {
+
+            try {
+                List<Message> retrievedMessages = this.chatService.history(channelName, LocalDate.now(), LocalDate.now());
+                Long latestTimeStamp = retrievedMessages.get(retrievedMessages.size() -1).getTimestamp();
+
+                if (messages.isEmpty()) {
+                    messages.addAll(retrievedMessages);
+                } else {
+                    for(Message retrievedMessage: retrievedMessages) {
+
+                        Long messageTimeStamp = retrievedMessage.getTimestamp();
+
+                        if(latestTimeStamp <= messageTimeStamp) {
+                            callback.call(retrievedMessage);
+                            messages.add(retrievedMessage);
+                        }
+                    }
+                }
+
+            } catch (InvalidComponentException | InvalidArgumentException exception) {
+                exception.printStackTrace();
+            }
+        }, 0, CALL_RATE, TimeUnit.SECONDS);
     }
+
 
     public void onMessageUpdate(String channelName, MessageCallbackInterface callback) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
         List<Message> messages = new ArrayList<>();
-
         registerEvent(() -> {
             LocalDate toDate = LocalDate.now();
             LocalDate fromDate = toDate.minusDays(5);
@@ -57,27 +87,26 @@ public class ChatListener extends Listener {
     public void onNewMember(String channelName, MemberCallbackInterface callback) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-        List<ChannelMember> members = new ArrayList<>();
-        registerEvent(() -> {
+        CopyOnWriteArrayList<ChannelMember> members = new CopyOnWriteArrayList<>();
+        executorService.scheduleAtFixedRate(() -> {
             try {
                 List<ChannelMember> retrievedMembers = chatService.members(channelName);
 
-                if (!members.isEmpty()) {
+                if (members.isEmpty()) {
+                    members.addAll(retrievedMembers);
+                } else {
                     for (ChannelMember retrievedMember : retrievedMembers) {
                         if (!members.stream().filter(o -> o.getId().equals(retrievedMember.getId())).findFirst().isPresent()) {
                             callback.call(retrievedMember);
+                            members.add(retrievedMember);
                         }
                     }
                 }
 
-                // this guarantees that if members are removed, if added again it will generate an event for that member
-                members.clear();
-                members.addAll(retrievedMembers);
-
             } catch (InvalidComponentException e) {
                 e.printStackTrace();
             }
-        });
+        }, 0, CALL_RATE, TimeUnit.SECONDS);
     }
 
     private int findMessageById(List<Message> messages, String messageId) {
@@ -89,5 +118,4 @@ public class ChatListener extends Listener {
 
         return -1;
     }
-
 }
