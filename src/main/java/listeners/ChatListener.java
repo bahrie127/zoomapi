@@ -24,9 +24,39 @@ public class ChatListener {
         this.chatService = new ChatService();
     }
 
-    public void onNewMessage(String channelName, MessageCallbackInterface callback) {
 
+    public void onNewMessage(String channelName, MessageCallbackInterface callback) {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+        CopyOnWriteArrayList<Message> messages = new CopyOnWriteArrayList<>();
+        executorService.scheduleAtFixedRate(() -> {
+            LocalDate toDate = LocalDate.now();
+            LocalDate fromDate = toDate.minusDays(5);
+
+            try {
+                List<Message> retrievedMessages = this.chatService.history(channelName, fromDate, toDate);
+                Long latestTimeStamp = retrievedMessages.get(retrievedMessages.size() -1).getTimestamp();
+
+                for(Message retrievedMessage: retrievedMessages) {
+
+                    Long messageTimeStamp = retrievedMessage.getTimestamp();
+
+                    if(messageTimeStamp < latestTimeStamp) {
+                        messages.add(retrievedMessage);
+                    }
+                    else {
+                        callback.call(retrievedMessage);
+                        latestTimeStamp = messageTimeStamp;
+                        messages.add(retrievedMessage);
+                    }
+                }
+
+            } catch (InvalidComponentException | InvalidArgumentException exception) {
+                exception.printStackTrace();
+            }
+        }, 0, CALL_RATE, TimeUnit.SECONDS);
     }
+
 
     public void onMessageUpdate(String channelName, MessageCallbackInterface callback) {
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
