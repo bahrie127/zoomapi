@@ -24,22 +24,18 @@ public class ChatListener extends Listener {
     }
 
     public void onNewMessage(String channelName, MessageCallbackInterface callback) {
-        List<Message> messages = new ArrayList<>();
         AtomicReference<Long> latestTimeStamp = new AtomicReference<>(0L);
         registerEvent(() -> {
             try {
                 LocalDate date = LocalDate.now(ZoneOffset.UTC);
                 List<Message> retrievedMessages = this.chatService.history(channelName, date, date);
 
-                if (messages.isEmpty()) {
-                    messages.addAll(retrievedMessages);
-                } else {
+                if (latestTimeStamp.get() != 0) {
                     for(Message retrievedMessage: retrievedMessages) {
                         Long messageTimeStamp = retrievedMessage.getTimestamp();
 
                         if(latestTimeStamp.get() < messageTimeStamp) {
                             callback.call(retrievedMessage);
-                            messages.add(retrievedMessage);
                         }
                     }
                 }

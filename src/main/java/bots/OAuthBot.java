@@ -31,8 +31,8 @@ public class OAuthBot {
         tunnel.close();
 
         Gson gson = new Gson();
-        client.getChatListener().onNewMessage("test", (message) -> System.out.println(gson.toJson(message)));
-        client.getChatListener().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
-        client.getChatListener().onNewMember("New Channel", (member) -> System.out.println(gson.toJson(member)));
+        client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
+        client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
+        client.getChatListener().onNewMember("New Channel", (member) -> System.out.println("New member: " + gson.toJson(member)));
     }
 }
