@@ -95,7 +95,7 @@ public class ChatListener extends Listener {
                     }
                 }
 
-            } catch (InvalidComponentException e) {
+            } catch (InvalidComponentException | InvalidArgumentException e) {
                 e.printStackTrace();
             }
         });

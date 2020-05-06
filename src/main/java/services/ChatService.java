@@ -22,12 +22,9 @@ public class ChatService {
         this.chatMessage = new ChatMessageComponent();
     }
 
-    public void sendMessage(String channelName, String message) throws InvalidComponentException {
+    public void sendMessage(String channelName, String message) throws InvalidComponentException, InvalidArgumentException {
         Channel currentChannel = findByChannelName(channelName, null);
-
-        if (currentChannel != null) {
-            chatMessage.postMessage(message, currentChannel.getId(), 1);
-        }
+        chatMessage.postMessage(message, currentChannel.getId(), 1);
     }
 
     public List<Message> history(String channelName, LocalDate fromDate, LocalDate toDate) throws InvalidComponentException, InvalidArgumentException {
@@ -64,19 +61,16 @@ public class ChatService {
         return messages;
     }
 
-    public List<ChannelMember> members(String channelName) throws InvalidComponentException {
+    public List<ChannelMember> members(String channelName) throws InvalidComponentException, InvalidArgumentException {
         Channel channel = findByChannelName(channelName, null);
 
-        if (channel != null) {
-            List<ChannelMember> members = new ArrayList<>();
-            getMembers(channel.getId(), null, members);
+        List<ChannelMember> members = new ArrayList<>();
+        getMembers(channel.getId(), null, members);
 
-            return members;
-        }
-        return null;
+        return members;
     }
 
-    private Channel findByChannelName(String channelName, String nextPageToken) throws InvalidComponentException {
+    private Channel findByChannelName(String channelName, String nextPageToken) throws InvalidComponentException, InvalidArgumentException {
         Map<String, Object> params = new HashMap<>();
         params.put("page_size", 50);
 
@@ -99,7 +93,7 @@ public class ChatService {
             }
         }
 
-        return null;
+        throw new InvalidArgumentException("Channel doesn't exist.");
     }
 
     private void getMessagesByDate(String memberId, String channelId, int recipientType, LocalDate date,
