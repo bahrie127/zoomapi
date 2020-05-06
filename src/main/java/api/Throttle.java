@@ -23,7 +23,6 @@ public class Throttle {
 
             if ((queue.size() == maxNumberCalls) && ((now - queue.peek()) < timeFrame)) {
                 Long sleep = timeFrame - (now - queue.peek());
-                System.out.println("Calls/second rate exceeded. Slowing down for " + sleep + " milliseconds.");
                 Thread.sleep(sleep);
             }
 
