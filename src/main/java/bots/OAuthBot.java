@@ -32,7 +32,7 @@ public class OAuthBot {
 
         Gson gson = new Gson();
         client.getChatListener().onNewMessage("test", (message) -> System.out.println(gson.toJson(message)));
-        //client.getChatListener().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
-        //client.getChatListener().onNewMember("New Channel", (member) -> System.out.println(gson.toJson(member)));
+        client.getChatListener().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
+        client.getChatListener().onNewMember("New Channel", (member) -> System.out.println(gson.toJson(member)));
     }
 }
