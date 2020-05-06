@@ -9,17 +9,14 @@ import models.Message;
 import services.ChatService;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ChatListener extends Listener {
 
     private ChatService chatService;
-    private static final int CALL_RATE = 10;
 
     public ChatListener() {
         super();
@@ -28,42 +25,41 @@ public class ChatListener extends Listener {
 
 
     public void onNewMessage(String channelName, MessageCallbackInterface callback) {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-        CopyOnWriteArrayList<Message> messages = new CopyOnWriteArrayList<>();
-        executorService.scheduleAtFixedRate(() -> {
-
+        List<Message> messages = new ArrayList<>();
+        AtomicReference<Long> latestTimeStamp = new AtomicReference<>(0L);
+        registerEvent(() -> {
             try {
-                List<Message> retrievedMessages = this.chatService.history(channelName, LocalDate.now(), LocalDate.now());
-                Long latestTimeStamp = retrievedMessages.get(retrievedMessages.size() -1).getTimestamp();
+                LocalDate date = LocalDate.now(ZoneOffset.UTC);
+                List<Message> retrievedMessages = this.chatService.history(channelName, date, date);
 
                 if (messages.isEmpty()) {
                     messages.addAll(retrievedMessages);
                 } else {
                     for(Message retrievedMessage: retrievedMessages) {
-
                         Long messageTimeStamp = retrievedMessage.getTimestamp();
 
-                        if(latestTimeStamp <= messageTimeStamp) {
+                        if(latestTimeStamp.get() < messageTimeStamp) {
                             callback.call(retrievedMessage);
                             messages.add(retrievedMessage);
                         }
                     }
                 }
 
+                if (!retrievedMessages.isEmpty()) {
+                    latestTimeStamp.set(retrievedMessages.get(retrievedMessages.size() - 1).getTimestamp());
+                }
+
             } catch (InvalidComponentException | InvalidArgumentException exception) {
                 exception.printStackTrace();
             }
-        }, 0, CALL_RATE, TimeUnit.SECONDS);
+        });
     }
 
 
     public void onMessageUpdate(String channelName, MessageCallbackInterface callback) {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
         List<Message> messages = new ArrayList<>();
         registerEvent(() -> {
-            LocalDate toDate = LocalDate.now();
+            LocalDate toDate = LocalDate.now(ZoneOffset.UTC);
             LocalDate fromDate = toDate.minusDays(5);
             try {
                 List<Message> retrievedMessages = this.chatService.history(channelName, fromDate, toDate);
@@ -85,10 +81,8 @@ public class ChatListener extends Listener {
     }
 
     public void onNewMember(String channelName, MemberCallbackInterface callback) {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-        CopyOnWriteArrayList<ChannelMember> members = new CopyOnWriteArrayList<>();
-        executorService.scheduleAtFixedRate(() -> {
+        List<ChannelMember> members = new ArrayList<>();
+        registerEvent(() -> {
             try {
                 List<ChannelMember> retrievedMembers = chatService.members(channelName);
 
@@ -106,7 +100,7 @@ public class ChatListener extends Listener {
             } catch (InvalidComponentException e) {
                 e.printStackTrace();
             }
-        }, 0, CALL_RATE, TimeUnit.SECONDS);
+        });
     }
 
     private int findMessageById(List<Message> messages, String messageId) {

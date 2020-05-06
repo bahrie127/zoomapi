@@ -89,7 +89,6 @@ public class ApiClient {
                 }
             }
 
-            System.out.println(uriBuilder.toString());
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(uriBuilder.toString()))
                     .timeout(Duration.ofSeconds(this.timeout))

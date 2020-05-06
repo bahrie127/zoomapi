@@ -14,6 +14,7 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 public class OAuthBot {
@@ -29,14 +30,13 @@ public class OAuthBot {
 
         NgrokTunnel tunnel = new NgrokTunnel(4041);
         String redirectUri = tunnel.url();
-        System.out.println("Redirect url: " + redirectUri);
         OAuthClient client = new OAuthClient(clientId, clientSecret, port, redirectUri, 10);
 
         tunnel.close();
 
         Gson gson = new Gson();
         client.getChatListener().onNewMessage("test", (message) -> System.out.println(gson.toJson(message)));
-//        client.getChatListener().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
-//        client.getChatListener().onNewMember("New Channel", (member) -> System.out.println(gson.toJson(member)));
+        //client.getChatListener().onMessageUpdate("test", (message) -> System.out.println(gson.toJson(message)));
+        //client.getChatListener().onNewMember("New Channel", (member) -> System.out.println(gson.toJson(member)));
     }
 }
