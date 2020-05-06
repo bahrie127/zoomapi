@@ -23,7 +23,6 @@ public class ChatListener extends Listener {
         this.chatService = new ChatService();
     }
 
-
     public void onNewMessage(String channelName, MessageCallbackInterface callback) {
         List<Message> messages = new ArrayList<>();
         AtomicReference<Long> latestTimeStamp = new AtomicReference<>(0L);
@@ -54,7 +53,6 @@ public class ChatListener extends Listener {
             }
         });
     }
-
 
     public void onMessageUpdate(String channelName, MessageCallbackInterface callback) {
         List<Message> messages = new ArrayList<>();
