@@ -2,8 +2,6 @@ package listeners;
 
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
-import interfaces.MemberCallbackInterface;
-import interfaces.MessageCallbackInterface;
 import models.ChannelMember;
 import models.Message;
 import services.ChatService;
@@ -13,6 +11,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public class ChatListener extends Listener {
 
@@ -23,7 +22,7 @@ public class ChatListener extends Listener {
         this.chatService = new ChatService();
     }
 
-    public void onNewMessage(String channelName, MessageCallbackInterface callback) {
+    public void onNewMessage(String channelName, Consumer<Message> callback) {
         AtomicReference<Long> latestTimeStamp = new AtomicReference<>(0L);
         registerEvent(() -> {
             try {
@@ -35,7 +34,7 @@ public class ChatListener extends Listener {
                         Long messageTimeStamp = retrievedMessage.getTimestamp();
 
                         if(latestTimeStamp.get() < messageTimeStamp) {
-                            callback.call(retrievedMessage);
+                            callback.accept(retrievedMessage);
                         }
                     }
                 }
@@ -50,7 +49,7 @@ public class ChatListener extends Listener {
         });
     }
 
-    public void onMessageUpdate(String channelName, MessageCallbackInterface callback) {
+    public void onMessageUpdate(String channelName, Consumer<Message> callback) {
         List<Message> messages = new ArrayList<>();
         registerEvent(() -> {
             LocalDate toDate = LocalDate.now(ZoneOffset.UTC);
@@ -63,7 +62,7 @@ public class ChatListener extends Listener {
                     if (matchedMessageId == -1) { // if message doesnt exist locally, adds it to the list
                         messages.add(retrievedMessage);
                     } else if (!messages.get(matchedMessageId).getMessage().equals(retrievedMessage.getMessage())) { // if content of the message was changed
-                        callback.call(retrievedMessage);
+                        callback.accept(retrievedMessage);
                         messages.set(matchedMessageId, retrievedMessage);
                     }
                 }
@@ -74,7 +73,7 @@ public class ChatListener extends Listener {
         });
     }
 
-    public void onNewMember(String channelName, MemberCallbackInterface callback) {
+    public void onNewMember(String channelName, Consumer<ChannelMember> callback) {
         List<ChannelMember> members = new ArrayList<>();
         registerEvent(() -> {
             try {
@@ -85,7 +84,7 @@ public class ChatListener extends Listener {
                 } else {
                     for (ChannelMember retrievedMember : retrievedMembers) {
                         if (!members.stream().filter(o -> o.getId().equals(retrievedMember.getId())).findFirst().isPresent()) {
-                            callback.call(retrievedMember);
+                            callback.accept(retrievedMember);
                             members.add(retrievedMember);
                         }
                     }
