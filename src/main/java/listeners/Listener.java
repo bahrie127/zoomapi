@@ -1,7 +1,5 @@
 package listeners;
 
-import interfaces.ListenerCallbackInterface;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +9,10 @@ public class Listener {
     private static final int SLEEP = 10000;
     private boolean isRegistrationAvailable = true;
 
-    protected void registerEvent(ListenerCallbackInterface callback) {
+    protected void registerEvent(Runnable callback) {
         Thread thread = new Thread(() -> {
             while (this.isRegistrationAvailable) {
-                callback.call();
+                callback.run();
                 try {
                     Thread.sleep(SLEEP);
                 } catch (InterruptedException e) {
