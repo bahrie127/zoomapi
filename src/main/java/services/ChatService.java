@@ -4,11 +4,11 @@ import components.ChatChannelComponent;
 import components.ChatMessageComponent;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
-import interfaces.MessageInterface;
 import models.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -48,12 +48,12 @@ public class ChatService {
         return messageHistory;
     }
 
-    public List<Message> search(String channelName, LocalDate fromDate, LocalDate toDate, MessageInterface condition) throws InvalidComponentException, InvalidArgumentException {
+    public List<Message> search(String channelName, LocalDate fromDate, LocalDate toDate, Predicate condition) throws InvalidComponentException, InvalidArgumentException {
         List<Message> messages = new ArrayList<>();
         List<Message> messageHistory = history(channelName, fromDate, toDate);
 
         for (Message message : messageHistory) {
-            if (condition.call(message)) {
+            if (condition.test(message)) {
                 messages.add(message);
             }
         }
