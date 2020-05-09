@@ -48,7 +48,7 @@ public class ChatService {
         return messageHistory;
     }
 
-    public List<Message> search(String channelName, LocalDate fromDate, LocalDate toDate, Predicate condition) throws InvalidComponentException, InvalidArgumentException {
+    public List<Message> search(String channelName, LocalDate fromDate, LocalDate toDate, Predicate<Message> condition) throws InvalidComponentException, InvalidArgumentException {
         List<Message> messages = new ArrayList<>();
         List<Message> messageHistory = history(channelName, fromDate, toDate);
 
