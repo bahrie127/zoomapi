@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
+import models.ChannelMember;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -12,6 +13,7 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class OAuthBot {
 
@@ -33,6 +35,6 @@ public class OAuthBot {
         Gson gson = new Gson();
         client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
-        client.getChatListener().onNewMember("New Channel", (member) -> System.out.println("New member: " + gson.toJson(member)));
+        client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));
     }
 }
