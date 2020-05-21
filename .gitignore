@@ -15,3 +15,6 @@
 .pydevproject
 .settings/
 
+# Database
+cache.db
+
