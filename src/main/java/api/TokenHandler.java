@@ -1,5 +1,7 @@
 package api;
 
+import entities.CredentialEntity;
+import exceptions.InvalidEntityException;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
@@ -9,6 +11,7 @@ import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
+import repositories.CredentialRepository;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -21,6 +24,11 @@ import java.net.URI;
 public class TokenHandler {
 
     private String code;
+    private CredentialRepository credentialRepository;
+
+    public TokenHandler() throws InvalidEntityException {
+        credentialRepository = new CredentialRepository();
+    }
 
     /**
      * Opens a HTTP receiver to obtain the authorization code required for the token
@@ -66,6 +74,11 @@ public class TokenHandler {
     public String getOAuthToken(String clientId, String clientSecret,
                                 String redirectUri) throws OAuthSystemException, OAuthProblemException, IOException {
 
+        /*String storedToken = getTokenFromRepository(clientId);
+        if (storedToken != null) {
+            return storedToken;
+        }*/
+
         OAuthClientRequest authorizationCodeRequest = OAuthClientRequest
                 .authorizationLocation("https://zoom.us/oauth/authorize")
                 .setResponseType("code")
@@ -88,8 +101,16 @@ public class TokenHandler {
                 .buildQueryMessage();
 
         OAuthClient client = new OAuthClient(new URLConnectionClient());
-
-        return client.accessToken(accessTokenRequest, OAuth.HttpMethod.POST, OAuthJSONAccessTokenResponse.class)
+        String token = client.accessToken(accessTokenRequest, OAuth.HttpMethod.POST, OAuthJSONAccessTokenResponse.class)
                 .getAccessToken();
+
+        credentialRepository.save(new CredentialEntity(clientId, token));
+        return token;
+    }
+
+    private String getTokenFromRepository(String clientId) {
+        //TODO: get token from repository
+
+        return null;
     }
 }

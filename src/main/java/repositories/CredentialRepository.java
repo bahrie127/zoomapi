@@ -1,9 +1,10 @@
 package repositories;
 
-import entities.Credential;
+import entities.CredentialEntity;
+import exceptions.InvalidEntityException;
 
-public class CredentialRepository extends Repository<Credential> {
-    public CredentialRepository() {
-        super("credentials", Credential.class);
+public class CredentialRepository extends Repository<CredentialEntity, String> {
+    public CredentialRepository() throws InvalidEntityException {
+        super(CredentialEntity.class);
     }
 }

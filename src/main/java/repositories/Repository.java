@@ -1,34 +1,49 @@
 package repositories;
 
+import annonations.Column;
+import annonations.NotNull;
+import annonations.PrimaryKey;
+import annonations.Table;
+import exceptions.InvalidEntityException;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Repository<T> {
+public class Repository<T, K> {
 
     private Connection connection = null;
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    private String databaseUrl = "jdbc:sqlite:cache.db";
-    private Class<?> entityClass;
+    private final String DATABASE_URL = "jdbc:sqlite:cache.db";
     private Field[] fields;
+    private Class entityClass;
     private String tableName;
+    private String idFieldName;
 
-    public Repository(String tableName, Class<T> entityClass) {
+    public Repository(Class<T> entityClass) throws InvalidEntityException {
+
+        if (!entityClass.isAnnotationPresent(Table.class)) {
+            throw new InvalidEntityException("Entity is missing table name.");
+        }
+
         this.connect();
-        
+
         this.entityClass = entityClass;
         this.fields = entityClass.getDeclaredFields();
-        this.tableName = tableName;
+        this.tableName = entityClass.getDeclaredAnnotation(Table.class).value();
         createTable();
     }
 
     private void connect() {
         if (connection == null) {
             try {
-                connection = DriverManager.getConnection(databaseUrl);
+                connection = DriverManager.getConnection(DATABASE_URL);
             } catch (SQLException e) {
                 logger.log(Level.WARNING, "Couldn't establish database connection.");
             }
@@ -45,8 +60,8 @@ public class Repository<T> {
         }
     }
 
-    public void store(T entity) {
-        StringBuilder sqlBuilder = new StringBuilder("INSERT INTO ");
+    public void save(T entity) {
+        StringBuilder sqlBuilder = new StringBuilder("INSERT OR REPLACE INTO ");
         StringBuilder valuesBuilder = new StringBuilder();
         List<Object> values = new ArrayList<>();
         boolean firstField = true;
@@ -63,7 +78,7 @@ public class Repository<T> {
                     valuesBuilder.append(",");
                 }
 
-                sqlBuilder.append(field.getName());
+                sqlBuilder.append(toSQLColumnName(field));
                 valuesBuilder.append("?");
                 field.setAccessible(true);
                 values.add(field.get(entity));
@@ -85,11 +100,31 @@ public class Repository<T> {
         }
     }
 
-    public void update(T entity) {
+    public Optional<T> findById(K id) {
+        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
+        sqlBuilder.append(this.tableName);
+        sqlBuilder.append(" WHERE ");
+        sqlBuilder.append(this.idFieldName);
+        sqlBuilder.append(" = ?;");
 
+        try {
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+            preparedStatement.setObject(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                T entity = (T) entityClass.getDeclaredConstructor().newInstance();
+                for (Field field : this.fields) {
+                }
+            }
+        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException exception) {
+            logger.warning(exception.getMessage());
+        }
+
+        return Optional.ofNullable(null);
     }
 
-    public List<T> get() {
+    public List<T> get(HashMap<String, Object> fields) {
         return null;
     }
 
@@ -110,14 +145,8 @@ public class Repository<T> {
                 sqlBuilder.append(",");
             }
 
-            sqlBuilder.append(field.getName());
-            sqlBuilder.append(" " + toSqlType(field.getType()));
+            sqlBuilder.append(generateColumn(field));
 
-            /*if (field.getName().equals("id ")) {
-                sqlBuilder.append(" PRIMARY KEY");
-            }*/
-
-            sqlBuilder.append(" NOT NULL");
         }
 
         sqlBuilder.append(");");
@@ -131,13 +160,41 @@ public class Repository<T> {
 
     }
 
-    private String toSqlType(Class<?> type) {
+    private String generateColumn(Field field) {
+        String columnName = toSQLColumnName(field);
+        StringBuilder columnBuilder = new StringBuilder(columnName);
+
+        columnBuilder.append(" " + toSQLDataType(field.getType()));
+
+        if (field.isAnnotationPresent(PrimaryKey.class)) {
+            columnBuilder.append(" PRIMARY KEY ");
+            this.idFieldName = columnName;
+        }
+
+        if (field.isAnnotationPresent(NotNull.class)) {
+            columnBuilder.append(" NOT NULL ");
+        }
+
+        return columnBuilder.toString();
+    }
+
+    private String toSQLColumnName(Field field) {
+        if (field.isAnnotationPresent(Column.class)) {
+            String columnName = field.getDeclaredAnnotation(Column.class).value();
+            if (columnName != null && !columnName.isEmpty()) {
+                return columnName;
+            }
+        }
+
+        return field.getName();
+    }
+
+    private String toSQLDataType(Class<?> type) {
         if (type.equals(String.class)) {
-            return "VARCHAR(255) ";
+            return "VARCHAR(255)";
         } else if (type.equals(Integer.class)) {
             return "INTEGER";
         }
         return "";
     }
-    
 }

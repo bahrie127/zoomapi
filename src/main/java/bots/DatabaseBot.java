@@ -1,17 +1,18 @@
 package bots;
 
-import entities.Credential;
+import entities.CredentialEntity;
+import exceptions.InvalidEntityException;
 import repositories.CredentialRepository;
 
 public class DatabaseBot {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidEntityException {
         CredentialRepository credentialRepository = new CredentialRepository();
 
-        Credential credential = new Credential();
-        credential.setId("TEST");
-        credential.setToken("TEST");
+        CredentialEntity credential = new CredentialEntity("TEST", "TEST");
+        credentialRepository.save(credential);
 
-        credentialRepository.store(credential);
+        CredentialEntity updatedCredential = new CredentialEntity("TEST", "DIFFERENT_TEST");
+        credentialRepository.save(updatedCredential);
     }
 }
