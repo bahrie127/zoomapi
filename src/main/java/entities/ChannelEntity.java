@@ -1,9 +1,6 @@
 package entities;
 
-import annonations.Column;
-import annonations.NotNull;
-import annonations.PrimaryKey;
-import annonations.Table;
+import annonations.*;
 
 @Table("channels")
 public class ChannelEntity {
