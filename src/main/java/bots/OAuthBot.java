@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
+import exceptions.InvalidEntityException;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -17,7 +18,7 @@ public class OAuthBot {
 
     private static final String SECTION_NAME = "OAuth";
 
-    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidComponentException, InvalidArgumentException {
+    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidEntityException {
         Wini ini = new Wini(new File(OAuthBot.class.getClassLoader().getResource("bot.ini").getFile()));
 
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);
@@ -31,8 +32,8 @@ public class OAuthBot {
         tunnel.close();
 
         Gson gson = new Gson();
-        client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
+        /*client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
-        client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));
+        client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));*/
     }
 }

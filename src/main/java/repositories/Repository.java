@@ -1,9 +1,6 @@
 package repositories;
 
-import annonations.Column;
-import annonations.NotNull;
-import annonations.PrimaryKey;
-import annonations.Table;
+import annonations.*;
 import exceptions.InvalidEntityException;
 
 import java.lang.reflect.Field;
@@ -115,8 +112,17 @@ public class Repository<T, K> {
             if (resultSet.next()) {
                 T entity = (T) entityClass.getDeclaredConstructor().newInstance();
                 for (Field field : this.fields) {
+                    field.setAccessible(true);
+                    if (field.isAnnotationPresent(Column.class)) {
+                        Object value = resultSet.getObject(field.getDeclaredAnnotation(Column.class).value());
+                        field.set(entity, value);
+                    }
                 }
+
+                return Optional.of(entity);
             }
+
+
         } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException exception) {
             logger.warning(exception.getMessage());
         }
@@ -128,11 +134,24 @@ public class Repository<T, K> {
         return null;
     }
 
-    public void delete() {
+    public void remove(K id) {
+        StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ");
+        sqlBuilder.append(this.tableName);
+        sqlBuilder.append(" WHERE ");
+        sqlBuilder.append(this.idFieldName);
+        sqlBuilder.append(" = ?;");
 
+        try {
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+
+            preparedStatement.setObject(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.warning(exception.getMessage());
+        }
     }
 
-    private void createTable() {
+    private void createTable() throws InvalidEntityException {
         StringBuilder sqlBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
         sqlBuilder.append(this.tableName);
         sqlBuilder.append("(");
@@ -160,20 +179,22 @@ public class Repository<T, K> {
 
     }
 
-    private String generateColumn(Field field) {
+    private String generateColumn(Field field) throws InvalidEntityException {
         String columnName = toSQLColumnName(field);
         StringBuilder columnBuilder = new StringBuilder(columnName);
 
         columnBuilder.append(" " + toSQLDataType(field.getType()));
 
         if (field.isAnnotationPresent(PrimaryKey.class)) {
-            columnBuilder.append(" PRIMARY KEY ");
+            columnBuilder.append(" PRIMARY KEY");
             this.idFieldName = columnName;
         }
 
         if (field.isAnnotationPresent(NotNull.class)) {
-            columnBuilder.append(" NOT NULL ");
+            columnBuilder.append(" NOT NULL");
         }
+
+        columnBuilder.append(generateForeignKey(field));
 
         return columnBuilder.toString();
     }
@@ -194,7 +215,34 @@ public class Repository<T, K> {
             return "VARCHAR(255)";
         } else if (type.equals(Integer.class)) {
             return "INTEGER";
+        } else if (type.equals(Date.class)) {
+            return "DATETIME";
         }
+
+        return "";
+    }
+
+    private String generateForeignKey(Field field) throws InvalidEntityException {
+        if(field.isAnnotationPresent(ForeignKey.class)) {
+            StringBuilder stringBuilder = new StringBuilder(" references ");
+            Class<?> referencedClass = field.getDeclaredAnnotation(ForeignKey.class).value();
+            if (!referencedClass.isAnnotationPresent(Table.class)) {
+                throw new InvalidEntityException("Foreign key entity is missing table name.");
+            }
+
+            stringBuilder.append(referencedClass.getDeclaredAnnotation(Table.class).value());
+            stringBuilder.append("(");
+
+            for (Field referencedField : referencedClass.getDeclaredFields()) {
+                if (referencedField.isAnnotationPresent(PrimaryKey.class)) {
+                    stringBuilder.append(referencedField.getName());
+                }
+            }
+            stringBuilder.append(")");
+
+            return stringBuilder.toString();
+        }
+
         return "";
     }
 }

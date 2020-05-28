@@ -8,6 +8,8 @@ import annonations.Table;
 @Table("credentials")
 public class CredentialEntity {
 
+    public CredentialEntity() {}
+
     public CredentialEntity(String clientId, String token) {
         this.clientId = clientId;
         this.token = token;

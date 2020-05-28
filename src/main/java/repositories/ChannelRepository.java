@@ -1,11 +1,11 @@
 package repositories;
 
+import entities.ChannelEntity;
 import exceptions.InvalidEntityException;
-import models.Channel;
 
-public class ChannelRepository extends Repository<Channel, String> {
+public class ChannelRepository extends Repository<ChannelEntity, String> {
 
     public ChannelRepository() throws InvalidEntityException {
-        super(Channel.class);
+        super(ChannelEntity.class);
     }
 }

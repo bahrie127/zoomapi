@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.util.Optional;
 
 public class TokenHandler {
 
@@ -74,10 +75,10 @@ public class TokenHandler {
     public String getOAuthToken(String clientId, String clientSecret,
                                 String redirectUri) throws OAuthSystemException, OAuthProblemException, IOException {
 
-        /*String storedToken = getTokenFromRepository(clientId);
-        if (storedToken != null) {
-            return storedToken;
-        }*/
+        Optional<CredentialEntity> storedCredentials = credentialRepository.findById(clientId);
+        if (storedCredentials.isPresent()) {
+            return storedCredentials.get().getToken();
+        }
 
         OAuthClientRequest authorizationCodeRequest = OAuthClientRequest
                 .authorizationLocation("https://zoom.us/oauth/authorize")
@@ -106,11 +107,5 @@ public class TokenHandler {
 
         credentialRepository.save(new CredentialEntity(clientId, token));
         return token;
-    }
-
-    private String getTokenFromRepository(String clientId) {
-        //TODO: get token from repository
-
-        return null;
     }
 }

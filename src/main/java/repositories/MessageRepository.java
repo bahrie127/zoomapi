@@ -1,10 +1,11 @@
 package repositories;
 
+import entities.MessageEntity;
 import exceptions.InvalidEntityException;
 import models.Message;
 
-public class MessageRepository extends Repository<Message, String> {
+public class MessageRepository extends Repository<MessageEntity, String> {
     public MessageRepository() throws InvalidEntityException {
-        super(Message.class);
+        super(MessageEntity.class);
     }
 }
