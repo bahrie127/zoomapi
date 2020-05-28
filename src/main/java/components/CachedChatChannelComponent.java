@@ -44,4 +44,24 @@ public class CachedChatChannelComponent {
 
         this.channelRepository.save(channelEntity);
     }
+
+    private Channel entityToModel(ChannelEntity entity) {
+        Channel channel = new Channel();
+
+        channel.setId(entity.getId());
+        channel.setName(entity.getName());
+        channel.setType(entity.getType());
+
+        return channel;
+    }
+
+    private ChannelEntity modelToEntity(Channel model) {
+        ChannelEntity entity = new ChannelEntity();
+
+        entity.setId(model.getId());
+        entity.setName(model.getName());
+        entity.setType(model.getType());
+
+        return entity;
+    }
 }
