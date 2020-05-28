@@ -34,4 +34,14 @@ public class CachedChatChannelComponent {
         chatChannelComponent.deleteChannel(channelId);
         this.channelRepository.remove(channelId);
     }
+
+    public void updateChannel(String channelId, String name) throws InvalidComponentException {
+
+        chatChannelComponent.updateChannel(channelId, name);
+        ChannelEntity channelEntity = new ChannelEntity();
+        channelEntity.setId(channelId);
+        channelEntity.setName(name);
+
+        this.channelRepository.save(channelEntity);
+    }
 }
