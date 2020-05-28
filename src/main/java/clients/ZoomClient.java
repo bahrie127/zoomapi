@@ -2,6 +2,7 @@ package clients;
 
 import api.ApiClient;
 import components.*;
+import exceptions.InvalidEntityException;
 import listeners.ChatListener;
 import services.ChatService;
 
@@ -11,7 +12,7 @@ public class ZoomClient {
     private String apiSecret;
     private ApiClient apiClient;
     private UserComponent user;
-    private ChatChannelComponent chatChannels;
+    private CachedChatChannelComponent chatChannels;
     private ChatMessageComponent chatMessages;
     private MeetingComponent meeting;
     private RecordingComponent recording;
@@ -20,7 +21,7 @@ public class ZoomClient {
     private ChatService chat;
     private ChatListener chatListener;
 
-    public ZoomClient(String apiKey, String apiSecret, Integer timeout) throws InterruptedException {
+    public ZoomClient(String apiKey, String apiSecret, Integer timeout) throws InterruptedException, InvalidEntityException {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
 
@@ -29,7 +30,7 @@ public class ZoomClient {
         apiClient.setTimeout(timeout);
 
         this.user = new UserComponent();
-        this.chatChannels = new ChatChannelComponent();
+        this.chatChannels = new CachedChatChannelComponent();
         this.chatMessages = new ChatMessageComponent();
         this.meeting = new MeetingComponent();
         this.recording = new RecordingComponent();
@@ -67,7 +68,7 @@ public class ZoomClient {
         return user;
     }
 
-    public ChatChannelComponent getChatChannels() {
+    public CachedChatChannelComponent getChatChannels() {
         return chatChannels;
     }
 

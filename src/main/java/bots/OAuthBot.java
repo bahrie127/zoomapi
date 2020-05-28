@@ -13,12 +13,14 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class OAuthBot {
 
     private static final String SECTION_NAME = "OAuth";
 
-    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidEntityException {
+    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidEntityException, InvalidComponentException {
         Wini ini = new Wini(new File(OAuthBot.class.getClassLoader().getResource("bot.ini").getFile()));
 
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);
@@ -35,5 +37,7 @@ public class OAuthBot {
         /*client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
         client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));*/
+
+        client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("nicalgrant@gmail.com")));
     }
 }
