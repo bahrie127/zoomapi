@@ -7,7 +7,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -110,28 +109,38 @@ public class Repository<T, K> {
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                T entity = (T) entityClass.getDeclaredConstructor().newInstance();
-                for (Field field : this.fields) {
-                    field.setAccessible(true);
-                    if (field.isAnnotationPresent(Column.class)) {
-                        Object value = resultSet.getObject(field.getDeclaredAnnotation(Column.class).value());
-                        field.set(entity, value);
-                    }
-                }
-
-                return Optional.of(entity);
+                return Optional.of(entryToEntity(resultSet));
             }
 
-
-        } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException exception) {
+        } catch (SQLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             logger.warning(exception.getMessage());
         }
 
         return Optional.ofNullable(null);
     }
 
-    public List<T> get(HashMap<String, Object> fields) {
-        return null;
+    public List<T> get(String where) {
+        List<T> results = new ArrayList<>();
+
+        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
+        sqlBuilder.append(this.tableName);
+        sqlBuilder.append(" WHERE ");
+        sqlBuilder.append(where);
+
+        try {
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                results.add(entryToEntity(resultSet));
+            }
+
+        } catch (SQLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException exception) {
+            logger.warning(exception.getMessage());
+        }
+
+        return results;
+
     }
 
     public void remove(K id) {
@@ -244,5 +253,18 @@ public class Repository<T, K> {
         }
 
         return "";
+    }
+
+    private T entryToEntity(ResultSet resultSet) throws NoSuchMethodException, SQLException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        T entity = (T) entityClass.getDeclaredConstructor().newInstance();
+        for (Field field : this.fields) {
+            field.setAccessible(true);
+            if (field.isAnnotationPresent(Column.class)) {
+                Object value = resultSet.getObject(field.getDeclaredAnnotation(Column.class).value());
+                field.set(entity, value);
+            }
+        }
+
+        return entity;
     }
 }
