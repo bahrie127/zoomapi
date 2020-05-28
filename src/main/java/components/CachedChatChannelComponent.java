@@ -29,4 +29,9 @@ public class CachedChatChannelComponent {
 
         return channel;
     }
+
+    public void deleteChannel(String channelId) throws InvalidComponentException {
+        chatChannelComponent.deleteChannel(channelId);
+        this.channelRepository.remove(channelId);
+    }
 }
