@@ -52,6 +52,22 @@ public class CachedChatChannelComponent {
     }
 
 
+    public void deleteChannel(String channelId) throws InvalidComponentException {
+        chatChannelComponent.deleteChannel(channelId);
+        this.channelRepository.remove(channelId);
+    }
+
+    public void updateChannel(String channelId, String name) throws InvalidComponentException {
+
+        chatChannelComponent.updateChannel(channelId, name);
+        ChannelEntity channelEntity = new ChannelEntity();
+        channelEntity.setId(channelId);
+        channelEntity.setName(name);
+
+        this.channelRepository.save(channelEntity);
+    }
+
+
     private Channel entityToModel(ChannelEntity entity) {
         Channel channel = new Channel();
 
@@ -71,5 +87,4 @@ public class CachedChatChannelComponent {
 
         return entity;
     }
-
 }
