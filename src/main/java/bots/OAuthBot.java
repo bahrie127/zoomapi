@@ -3,8 +3,10 @@ package bots;
 import clients.OAuthClient;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
+import models.Channel;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -12,6 +14,8 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class OAuthBot {
 
@@ -31,19 +35,21 @@ public class OAuthBot {
         tunnel.close();
 
         Gson gson = new Gson();
-
-        //System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
-
-
-        //System.out.println(gson.toJson(client.getChatMessages().postMessage("hello", "97601359-20b6-4b64-a445-177b3231b1c0", 1)));
-
-        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "97601359-20b6-4b64-a445-177b3231b1c0", 1, null)));
-
         /*client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
         client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));*/
 
-        //client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("nicalgrant@gmail.com")));
-        //System.out.println(gson.toJson(client.getChatChannels().getChannel("97601359-20b6-4b64-a445-177b3231b1c0")));
+        client.getChatChannels().listChannels(null);
+        System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
+
+        Channel channel = client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("rafael.bellotti@gmail.com")));
+
+        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
+
+        client.getChatChannels().updateChannel(channel.getId(),"updated cached channel");
+        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
+
+
+        client.getChatChannels().deleteChannel(channel.getId());
     }
 }
