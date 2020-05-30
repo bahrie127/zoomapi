@@ -13,7 +13,7 @@ public class ZoomClient {
     private ApiClient apiClient;
     private UserComponent user;
     private CachedChatChannelComponent chatChannels;
-    private ChatMessageComponent chatMessages;
+    private CachedChatMessageComponent chatMessages;
     private MeetingComponent meeting;
     private RecordingComponent recording;
     private ReportComponent report;
@@ -31,7 +31,7 @@ public class ZoomClient {
 
         this.user = new UserComponent();
         this.chatChannels = new CachedChatChannelComponent();
-        this.chatMessages = new ChatMessageComponent();
+        this.chatMessages = new CachedChatMessageComponent();
         this.meeting = new MeetingComponent();
         this.recording = new RecordingComponent();
         this.report = new ReportComponent();
@@ -72,7 +72,7 @@ public class ZoomClient {
         return chatChannels;
     }
 
-    public ChatMessageComponent getChatMessages() {
+    public CachedChatMessageComponent getChatMessages() {
         return chatMessages;
     }
 

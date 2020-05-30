@@ -1,5 +1,6 @@
 package models;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Message {
@@ -7,7 +8,7 @@ public class Message {
     private String id;
     private String message;
     private String sender;
-    private Date dateTime;
+    private LocalDateTime dateTime;
     private Long timestamp;
 
     public String getId() {
@@ -34,11 +35,11 @@ public class Message {
         this.sender = sender;
     }
 
-    public Date getDateTime() {
+    public LocalDateTime getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
 

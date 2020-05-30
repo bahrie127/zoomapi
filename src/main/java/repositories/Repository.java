@@ -6,6 +6,7 @@ import exceptions.InvalidEntityException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -224,7 +225,7 @@ public class Repository<T, K> {
             return "VARCHAR(255)";
         } else if (type.equals(Integer.class)) {
             return "INTEGER";
-        } else if (type.equals(Date.class)) {
+        } else if (type.equals(LocalDateTime.class)) {
             return "DATETIME";
         }
 
@@ -260,7 +261,13 @@ public class Repository<T, K> {
         for (Field field : this.fields) {
             field.setAccessible(true);
             if (field.isAnnotationPresent(Column.class)) {
-                Object value = resultSet.getObject(field.getDeclaredAnnotation(Column.class).value());
+                String fieldName = field.getDeclaredAnnotation(Column.class).value();
+
+                Object value = resultSet.getObject(fieldName);
+                if (field.getType().equals(LocalDateTime.class)) {
+                    value = LocalDateTime.parse((String) value);
+                }
+
                 field.set(entity, value);
             }
         }

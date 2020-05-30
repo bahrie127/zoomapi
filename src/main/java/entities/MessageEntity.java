@@ -1,12 +1,11 @@
 package entities;
 
-import annonations.Column;
-import annonations.ForeignKey;
-import annonations.NotNull;
-import annonations.PrimaryKey;
+import annonations.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
+@Table("messages")
 public class MessageEntity {
 
     @PrimaryKey
@@ -23,7 +22,7 @@ public class MessageEntity {
 
     @NotNull
     @Column("date_time")
-    private Date dateTime;
+    private LocalDateTime dateTime;
 
     @NotNull
     @Column("timestamp")
@@ -33,6 +32,10 @@ public class MessageEntity {
     @Column("channel_id")
     @ForeignKey(ChannelEntity.class)
     private String channelId;
+
+    @NotNull
+    @Column("cached_date")
+    private LocalDateTime cachedDate;
 
     public String getId() {
         return id;
@@ -58,11 +61,11 @@ public class MessageEntity {
         this.sender = sender;
     }
 
-    public Date getDateTime() {
+    public LocalDateTime getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
@@ -80,5 +83,13 @@ public class MessageEntity {
 
     public void setChannelId(String channelId) {
         this.channelId = channelId;
+    }
+
+    public LocalDateTime getCachedDate() {
+        return cachedDate;
+    }
+
+    public void setCachedDate(LocalDateTime cacheDate) {
+        this.cachedDate = cacheDate;
     }
 }

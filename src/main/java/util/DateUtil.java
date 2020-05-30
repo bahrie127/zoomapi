@@ -13,4 +13,14 @@ public class DateUtil {
         return DATE_FORMAT.format(date);
     }
 
+    public static long minutesBetween(LocalDateTime date1, LocalDateTime date2) {
+        return Duration.between(date1, date2).toMinutes();
+    }
+
+    public static LocalDateTime dateToLocalDateTime(Date date) {
+        return date.toInstant()
+                .atZone(ZoneOffset.UTC)
+                .toLocalDateTime();
+    }
+
 }
