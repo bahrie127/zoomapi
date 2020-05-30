@@ -39,12 +39,16 @@ public class OAuthBot {
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
         client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));*/
 
+        client.getChatChannels().listChannels(null);
+        System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
+
         Channel channel = client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("rafael.bellotti@gmail.com")));
 
         System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
 
         client.getChatChannels().updateChannel(channel.getId(),"updated cached channel");
         System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
+
 
         client.getChatChannels().deleteChannel(channel.getId());
     }

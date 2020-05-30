@@ -3,11 +3,11 @@ package components;
 import entities.ChannelEntity;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
-import jdk.jfr.internal.Repository;
 import models.Channel;
 import models.ChannelCollection;
 import repositories.ChannelRepository;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +22,13 @@ public class CachedChatChannelComponent {
     }
 
     public ChannelCollection listChannels(Map<String, Object> params) throws InvalidComponentException {
+
+        ChannelCollection channelCollection = chatChannelComponent.listChannels(params);
+        for (Channel channel : channelCollection.getChannels()) {
+            ChannelEntity channelEntity = modelToEntity(channel);
+            this.channelRepository.save(channelEntity);
+        }
+
         return chatChannelComponent.listChannels(params);
     }
 
