@@ -62,14 +62,7 @@ public class CachedChatChannelComponent {
 
     public void deleteChannel(String channelId) throws InvalidComponentException {
         chatChannelComponent.deleteChannel(channelId);
-
-        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
-
-        if (optionalCachedEntity.isPresent()) {
-            ChannelEntity cachedEntity = optionalCachedEntity.get();
-            this.channelRepository.remove(cachedEntity.getId());
-        }
-        channelRepository.close();
+        this.channelRepository.remove(channelId);
     }
 
     public void updateChannel(String channelId, String name) throws InvalidComponentException {
