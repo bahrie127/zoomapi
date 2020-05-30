@@ -12,6 +12,7 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
 import repositories.CredentialRepository;
+import util.DateUtil;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -20,12 +21,15 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 public class TokenHandler {
 
     private String code;
     private CredentialRepository credentialRepository;
+    private static final long TOKEN_EXPIRATION = 60;
 
     public TokenHandler() throws InvalidEntityException {
         credentialRepository = new CredentialRepository();
@@ -75,9 +79,12 @@ public class TokenHandler {
     public String getOAuthToken(String clientId, String clientSecret,
                                 String redirectUri) throws OAuthSystemException, OAuthProblemException, IOException {
 
-        Optional<CredentialEntity> storedCredentials = credentialRepository.findById(clientId);
-        if (storedCredentials.isPresent()) {
-            return storedCredentials.get().getToken();
+        Optional<CredentialEntity> optionalStoredCredentials = credentialRepository.findById(clientId);
+        if (optionalStoredCredentials.isPresent()) {
+            CredentialEntity credentials = optionalStoredCredentials.get();
+            if (DateUtil.minutesBetween(credentials.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC)) < TOKEN_EXPIRATION) {
+                return optionalStoredCredentials.get().getToken();
+            }
         }
 
         OAuthClientRequest authorizationCodeRequest = OAuthClientRequest
@@ -105,7 +112,7 @@ public class TokenHandler {
         String token = client.accessToken(accessTokenRequest, OAuth.HttpMethod.POST, OAuthJSONAccessTokenResponse.class)
                 .getAccessToken();
 
-        credentialRepository.save(new CredentialEntity(clientId, token));
+        credentialRepository.save(new CredentialEntity(clientId, token, LocalDateTime.now(ZoneOffset.UTC)));
         return token;
     }
 }

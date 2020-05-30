@@ -5,14 +5,17 @@ import annonations.NotNull;
 import annonations.PrimaryKey;
 import annonations.Table;
 
+import java.time.LocalDateTime;
+
 @Table("credentials")
 public class CredentialEntity {
 
     public CredentialEntity() {}
 
-    public CredentialEntity(String clientId, String token) {
+    public CredentialEntity(String clientId, String token, LocalDateTime cachedDate) {
         this.clientId = clientId;
         this.token = token;
+        this.cachedDate = cachedDate;
     }
 
     @PrimaryKey
@@ -22,6 +25,10 @@ public class CredentialEntity {
     @NotNull
     @Column("token")
     private String token;
+
+    @NotNull
+    @Column("cached_date")
+    private LocalDateTime cachedDate;
 
     public String getClientId() {
         return clientId;
@@ -37,5 +44,13 @@ public class CredentialEntity {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public LocalDateTime getCachedDate() {
+        return cachedDate;
+    }
+
+    public void setCachedDate(LocalDateTime cachedDate) {
+        this.cachedDate = cachedDate;
     }
 }
