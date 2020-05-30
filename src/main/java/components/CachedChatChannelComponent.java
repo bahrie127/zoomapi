@@ -7,6 +7,7 @@ import models.Channel;
 import models.ChannelCollection;
 import repositories.ChannelRepository;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +22,13 @@ public class CachedChatChannelComponent {
     }
 
     public ChannelCollection listChannels(Map<String, Object> params) throws InvalidComponentException {
+
+        ChannelCollection channelCollection = chatChannelComponent.listChannels(params);
+        for (Channel channel : channelCollection.getChannels()) {
+            ChannelEntity channelEntity = modelToEntity(channel);
+            this.channelRepository.save(channelEntity);
+        }
+
         return chatChannelComponent.listChannels(params);
     }
 
@@ -60,11 +68,14 @@ public class CachedChatChannelComponent {
     public void updateChannel(String channelId, String name) throws InvalidComponentException {
 
         chatChannelComponent.updateChannel(channelId, name);
-        ChannelEntity channelEntity = new ChannelEntity();
-        channelEntity.setId(channelId);
-        channelEntity.setName(name);
 
-        this.channelRepository.save(channelEntity);
+        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
+
+        if (optionalCachedEntity.isPresent()) {
+            ChannelEntity cachedEntity = optionalCachedEntity.get();
+            cachedEntity.setName(name);
+            this.channelRepository.save(cachedEntity);
+        }
     }
 
 
