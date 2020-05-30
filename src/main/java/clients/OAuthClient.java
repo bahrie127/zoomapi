@@ -2,6 +2,7 @@ package clients;
 
 import api.TokenHandler;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
@@ -16,7 +17,7 @@ public class OAuthClient extends ZoomClient {
 
     public OAuthClient(String clientId, String clientSecret, Integer port,
                        String redirectUri, Integer timeout) throws OAuthSystemException,
-            OAuthProblemException, IOException, InterruptedException, InvalidEntityException {
+            OAuthProblemException, IOException, InterruptedException, InvalidEntityException, InvalidComponentException {
 
         super(clientId, clientSecret, timeout);
 

@@ -35,7 +35,7 @@ public class CachedChatMessageComponent {
 
     //TODO: save messages that are fetched from Zoom
     public MessageCollection listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InvalidComponentException {
-        LocalDate date;
+        /*LocalDate date;
 
         if (params.containsKey("date")) {
             date = (LocalDate) params.get("date");
@@ -51,7 +51,7 @@ public class CachedChatMessageComponent {
             if (timeDifference <= CACHE_INVALIDATION_TIME) {
                 return formColletion(messageEntities);
             }
-        }
+        }*/
 
         return chatMessageComponent.listMessages(userId, to, recipientType, params);
     }

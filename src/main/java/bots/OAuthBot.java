@@ -34,9 +34,10 @@ public class OAuthBot {
 
         //System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
 
-        System.out.println(gson.toJson(client.getChatMessages().postMessage("hello", "97601359-20b6-4b64-a445-177b3231b1c0", 1)));
 
+        //System.out.println(gson.toJson(client.getChatMessages().postMessage("hello", "97601359-20b6-4b64-a445-177b3231b1c0", 1)));
 
+        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "97601359-20b6-4b64-a445-177b3231b1c0", 1, null)));
 
         /*client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
