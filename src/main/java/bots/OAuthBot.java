@@ -14,14 +14,12 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class OAuthBot {
 
     private static final String SECTION_NAME = "OAuth";
 
-    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidEntityException, InvalidComponentException {
+    public static void main(String[] args) throws IOException, UnirestException, OAuthSystemException, InterruptedException, OAuthProblemException, InvalidEntityException, InvalidComponentException, InvalidArgumentException {
         Wini ini = new Wini(new File(OAuthBot.class.getClassLoader().getResource("bot.ini").getFile()));
 
         String clientId = ini.get(SECTION_NAME, "client_id", String.class);
@@ -35,21 +33,22 @@ public class OAuthBot {
         tunnel.close();
 
         Gson gson = new Gson();
+
+        //client.getChatMessages().postMessage("hello", "109ab13498c64fd5911a42be1076ea6b", 1);
+
+        //client.getChatMessages().deleteMessage(message.getId(), "97601359-20b6-4b64-a445-177b3231b1c0", 1);
+
+        //client.getChatMessages().putMessage("d83d4f47-1149-4f3b-a38a-da072e8b248a", "nope2", "97601359-20b6-4b64-a445-177b3231b1c0", 1);
+
+        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "109ab13498c64fd5911a42be1076ea6b", 1, null)));
+
         /*client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
         client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));*/
 
-        client.getChatChannels().listChannels(null);
-        System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
-
-        Channel channel = client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("rafael.bellotti@gmail.com")));
-
-        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
-
-        client.getChatChannels().updateChannel(channel.getId(),"updated cached channel");
-        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
-
-
-        client.getChatChannels().deleteChannel(channel.getId());
+        //client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("nicalgrant@gmail.com")));
+        //System.out.println(gson.toJson(client.getChatChannels().getChannel("97601359-20b6-4b64-a445-177b3231b1c0")));
     }
 }
+
+// Test channel id: 109ab13498c64fd5911a42be1076ea6b

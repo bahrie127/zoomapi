@@ -38,7 +38,7 @@ public class ChatMessageComponent {
             }
             params.put(toRecipientType(recipientType), to);
             HttpResponse response = ApiClient.getThrottledInstance().getRequest("/chat/users/" + userId + "/messages", params);
-            
+
             return gson.fromJson(response.body().toString(), MessageCollection.class);
         } catch (InterruptedException | InvalidRequestException | InvalidArgumentException exception) {
             throw new InvalidComponentException(exception.getMessage());

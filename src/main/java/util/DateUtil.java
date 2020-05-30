@@ -23,4 +23,8 @@ public class DateUtil {
                 .toLocalDateTime();
     }
 
+    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneOffset.UTC).toInstant());
+    }
+
 }
