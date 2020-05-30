@@ -3,6 +3,7 @@ package components;
 import entities.ChannelEntity;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
+import jdk.jfr.internal.Repository;
 import models.Channel;
 import models.ChannelCollection;
 import repositories.ChannelRepository;
@@ -54,17 +55,27 @@ public class CachedChatChannelComponent {
 
     public void deleteChannel(String channelId) throws InvalidComponentException {
         chatChannelComponent.deleteChannel(channelId);
-        this.channelRepository.remove(channelId);
+
+        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
+
+        if (optionalCachedEntity.isPresent()) {
+            ChannelEntity cachedEntity = optionalCachedEntity.get();
+            this.channelRepository.remove(cachedEntity.getId());
+        }
+        channelRepository.close();
     }
 
     public void updateChannel(String channelId, String name) throws InvalidComponentException {
 
         chatChannelComponent.updateChannel(channelId, name);
-        ChannelEntity channelEntity = new ChannelEntity();
-        channelEntity.setId(channelId);
-        channelEntity.setName(name);
 
-        this.channelRepository.save(channelEntity);
+        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
+
+        if (optionalCachedEntity.isPresent()) {
+            ChannelEntity cachedEntity = optionalCachedEntity.get();
+            cachedEntity.setName(name);
+            this.channelRepository.save(cachedEntity);
+        }
     }
 
 
