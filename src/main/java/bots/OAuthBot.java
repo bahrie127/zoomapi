@@ -6,10 +6,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
-import models.Channel;
-import models.ChannelMember;
-import models.ChannelMemberCollection;
-import models.User;
+import models.*;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -45,7 +42,7 @@ public class OAuthBot {
         client.getChatChannels().listChannels(null);
         System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
 
-        Channel channel = client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("rafael.bellotti@gmail.com")));
+        Channel channel = client.getChatChannels().createChannel("PUBLIC cached channel", 1, new ArrayList<String>(Arrays.asList("rafael.bellotti@gmail.com")));
         client.getChatChannels().updateChannel(channel.getId(), "updated cached channel");
 
         client.getChatChannels().listMembers(channel.getId(), null);

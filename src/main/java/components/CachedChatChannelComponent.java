@@ -109,10 +109,21 @@ public class CachedChatChannelComponent {
     }
 
 
-    //    TODO: Need to figure out how to cache channel members when email is the only thing provided
+    //    TODO: THIS SHOULD WORK IF JOINING PUBLIC CHANNEL
     public JoinedMember joinChannel(String channelId) throws InvalidComponentException {
 
+        User currentUser = this.userComponent.get("me", null);
+        ChannelMember channelMember = new ChannelMember();
         JoinedMember joinedMember = chatChannelComponent.joinChannel(channelId);
+
+        channelMember.setId(joinedMember.getId());
+        channelMember.setEmail(currentUser.getEmail());
+        channelMember.setFirstName(currentUser.getFirstName());
+        channelMember.setLastName(currentUser.getFirstName());
+        channelMember.setRole("member");
+
+        ChannelMemberEntity channelMemberEntity = memberModelToEntity(channelMember, channelId);
+        this.channelMemberRepository.save(channelMemberEntity);
         return chatChannelComponent.joinChannel(channelId);
     }
 
@@ -131,7 +142,6 @@ public class CachedChatChannelComponent {
 
         this.channelMemberRepository.remove(memberId);
         chatChannelComponent.leaveChannel(channelId);
-
     }
 
 
