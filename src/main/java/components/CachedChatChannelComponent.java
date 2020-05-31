@@ -17,6 +17,7 @@ public class CachedChatChannelComponent {
 
     private ChatChannelComponent chatChannelComponent = new ChatChannelComponent();
     private ChannelRepository channelRepository;
+    private UserComponent userComponent = new UserComponent();
     private ChannelMemberRepository channelMemberRepository = new ChannelMemberRepository();
 
     public CachedChatChannelComponent() throws InvalidEntityException {
@@ -91,6 +92,7 @@ public class CachedChatChannelComponent {
         return chatChannelComponent.listMembers(channelId, params);
     }
 
+
 //    TODO: Need to figure out how to cache channel members when email is the only thing provided
     public InvitedChannelMembers inviteMembers(String channelId, List<String> members) throws InvalidComponentException {
 
@@ -103,9 +105,9 @@ public class CachedChatChannelComponent {
             for (String email : members) {
 
         }
-
         return chatChannelComponent.inviteMembers(channelId, members);
     }
+
 
     //    TODO: Need to figure out how to cache channel members when email is the only thing provided
     public JoinedMember joinChannel(String channelId) throws InvalidComponentException {
@@ -113,6 +115,25 @@ public class CachedChatChannelComponent {
         JoinedMember joinedMember = chatChannelComponent.joinChannel(channelId);
         return chatChannelComponent.joinChannel(channelId);
     }
+
+
+    public void leaveChannel(String channelId) throws InvalidComponentException {
+
+        User currentUser = this.userComponent.get("me", null);
+        String memberId = "";
+
+        ChannelMemberCollection channelMemberCollection = chatChannelComponent.listMembers(channelId, null);
+
+        for(ChannelMember member: channelMemberCollection.getMembers()) {
+            if(member.getEmail().equals(currentUser.getEmail()))
+                memberId = member.getId();
+        }
+
+        this.channelMemberRepository.remove(memberId);
+        chatChannelComponent.leaveChannel(channelId);
+
+    }
+
 
     public void removeMember(String channelId, String memberId) throws InvalidComponentException {
         this.channelMemberRepository.remove(memberId);
