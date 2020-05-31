@@ -20,7 +20,6 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
 
     private ChannelRepository channelRepository;
     private ChannelMemberRepository channelMemberRepository = new ChannelMemberRepository();
-    private UserComponent userComponent = new UserComponent();
     private static final long CACHE_INVALIDATION_TIME = 20;
 
     public CachedChatChannelComponent() throws InvalidEntityException {
