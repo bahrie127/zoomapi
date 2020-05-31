@@ -44,6 +44,9 @@ public class OAuthBot {
 
         Channel channel = client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("rafael.bellotti@gmail.com")));
 
+        client.getChatChannels().listMembers(channel.getId(), null);
+        System.out.println(gson.toJson(client.getChatChannels().listMembers(channel.getId(),null)));
+
         System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
 
         client.getChatChannels().updateChannel(channel.getId(),"updated cached channel");

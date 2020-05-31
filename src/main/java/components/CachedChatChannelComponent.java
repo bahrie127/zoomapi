@@ -1,10 +1,11 @@
 package components;
 
 import entities.ChannelEntity;
+import entities.ChannelMemberEntity;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
-import models.Channel;
-import models.ChannelCollection;
+import models.*;
+import repositories.ChannelMemberRepository;
 import repositories.ChannelRepository;
 
 import java.util.Iterator;
@@ -16,6 +17,7 @@ public class CachedChatChannelComponent {
 
     private ChatChannelComponent chatChannelComponent = new ChatChannelComponent();
     private ChannelRepository channelRepository;
+    private ChannelMemberRepository channelMemberRepository = new ChannelMemberRepository();
 
     public CachedChatChannelComponent() throws InvalidEntityException {
         this.channelRepository = new ChannelRepository();
@@ -78,6 +80,17 @@ public class CachedChatChannelComponent {
         }
     }
 
+    public ChannelMemberCollection listMembers(String channelId, Map<String, Object> params) throws InvalidComponentException {
+        ChannelMemberCollection channelMemberCollection = chatChannelComponent.listMembers(channelId, params);
+
+        for(ChannelMember member: channelMemberCollection.getMembers()) {
+            ChannelMemberEntity channelMemberEntity = memberModelToEntity(member, channelId);
+            this.channelMemberRepository.save(channelMemberEntity);
+        }
+
+        return chatChannelComponent.listMembers(channelId, params);
+    }
+
 
     private Channel entityToModel(ChannelEntity entity) {
         Channel channel = new Channel();
@@ -95,6 +108,19 @@ public class CachedChatChannelComponent {
         entity.setId(model.getId());
         entity.setName(model.getName());
         entity.setType(model.getType());
+
+        return entity;
+    }
+
+    private ChannelMemberEntity memberModelToEntity(ChannelMember model, String channelId) {
+        ChannelMemberEntity entity = new ChannelMemberEntity();
+
+        entity.setId(model.getId());
+        entity.setEmail(model.getEmail());
+        entity.setFirstName(model.getFirstName());
+        entity.setLastName(model.getLastName());
+        entity.setRole(model.getRole());
+        entity.setChannelId(channelId);
 
         return entity;
     }
