@@ -8,11 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,15 +142,18 @@ public class Repository<T, K> {
         return Optional.ofNullable(null);
     }
 
-    public List<T> get(String where) {
+    protected List<T> get(String where) {
         List<T> results = new ArrayList<>();
         try {
             connect();
 
             StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
             sqlBuilder.append(this.tableName);
-            sqlBuilder.append(" WHERE ");
-            sqlBuilder.append(where);
+
+            if (where != null && !where.isEmpty()) {
+                sqlBuilder.append(" WHERE ");
+                sqlBuilder.append(where);
+            }
 
             PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
 
@@ -171,6 +170,10 @@ public class Repository<T, K> {
         return results;
     }
 
+    public List<T> findAll() {
+        return get(null);
+    }
+
     public void remove(K id) {
         try {
             connect();
@@ -184,6 +187,57 @@ public class Repository<T, K> {
             PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
 
             preparedStatement.setObject(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.warning(exception.getMessage());
+        }
+
+        close();
+    }
+
+    protected void removeByCondition(Map<String, Object> params) {
+        try {
+            connect();
+
+            StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ");
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append(" WHERE ");
+            List<Object> values = new ArrayList<>();
+
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                sqlBuilder.append(entry.getKey());
+                sqlBuilder.append(" = ? ");
+                values.add(entry.getValue());
+            }
+
+            sqlBuilder.append(";");
+
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+
+            int i = 1;
+            for (Object value : values) {
+                preparedStatement.setObject(i, value);
+                i++;
+            }
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.warning(exception.getMessage());
+        }
+
+        close();
+    }
+
+    public void removeAll() {
+        try {
+            connect();
+
+            StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ");
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append(";");
+
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             logger.warning(exception.getMessage());
@@ -220,6 +274,10 @@ public class Repository<T, K> {
         }
 
         close();
+
+        if (idFieldName == null) {
+            throw new InvalidEntityException("Missing primary key.");
+        }
     }
 
     private String generateColumn(Field field) throws InvalidEntityException {

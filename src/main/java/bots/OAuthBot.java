@@ -36,17 +36,18 @@ public class OAuthBot {
         tunnel.close();
 
         Gson gson = new Gson();
+        Map<String, Object> params = new HashMap<>();
+        params.put("page_size", 100);
 
-        //client.getChatMessages().postMessage("hello", "109ab13498c64fd5911a42be1076ea6b", 1);
+        //System.out.println(gson.toJson(client.getChatChannels().listChannels(params)));
 
-        //client.getChatMessages().deleteMessage(message.getId(), "97601359-20b6-4b64-a445-177b3231b1c0", 1);
+        System.out.println(gson.toJson(client.getChatChannels().listMembers("109ab13498c64fd5911a42be1076ea6b", params)));
 
-        //client.getChatMessages().putMessage("d83d4f47-1149-4f3b-a38a-da072e8b248a", "nope2", "97601359-20b6-4b64-a445-177b3231b1c0", 1);
-        LocalDate date = LocalDate.of(2020, 05, 19);
+        /*LocalDate date = LocalDate.of(2020, 05, 19);
         Map<String, Object> params = new HashMap<>();
         params.put("date", date.toString());
 
-        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "109ab13498c64fd5911a42be1076ea6b", 1, params)));
+        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "109ab13498c64fd5911a42be1076ea6b", 1, params)));*/
 
         /*client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
         client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
@@ -58,3 +59,5 @@ public class OAuthBot {
 }
 
 // Test channel id: 109ab13498c64fd5911a42be1076ea6b
+//TODO: work with concurrency
+//TODO: user id?

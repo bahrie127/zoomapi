@@ -2,6 +2,8 @@ package entities;
 
 import annonations.*;
 
+import java.time.LocalDateTime;
+
 @Table("channels_membership")
 public class ChannelMemberEntity {
 
@@ -29,6 +31,10 @@ public class ChannelMemberEntity {
     @Column("channel_id")
     @ForeignKey(ChannelEntity.class)
     private String channelId;
+
+    @NotNull
+    @Column("cached_date")
+    private LocalDateTime cachedDate;
 
     public String getId() {
         return id;
@@ -76,5 +82,13 @@ public class ChannelMemberEntity {
 
     public void setChannelId(String channelId) {
         this.channelId = channelId;
+    }
+
+    public LocalDateTime getCachedDate() {
+        return cachedDate;
+    }
+
+    public void setCachedDate(LocalDateTime cachedDate) {
+        this.cachedDate = cachedDate;
     }
 }

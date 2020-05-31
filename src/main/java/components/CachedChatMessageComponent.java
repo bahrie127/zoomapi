@@ -1,6 +1,7 @@
 package components;
 
 import com.google.gson.Gson;
+import entities.ChannelEntity;
 import entities.MessageEntity;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
@@ -32,22 +33,23 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
 
     @Override
     public MessageCollection listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InvalidComponentException {
-        LocalDate date;
 
-        if (params != null && params.containsKey("date")) {
-            date = LocalDate.parse((String) params.get("date"));
-        } else {
-            date = LocalDate.now(ZoneOffset.UTC);
-        }
+        if (!params.containsKey("next_page_token")) {
+            LocalDate date;
 
-        List<MessageEntity> messageEntities = messageRepository.getByDate(date);
-        if (messageEntities.size() > 0) {
-            MessageEntity latestEntity = messageEntities.get(0);
-            long timeDifference = DateUtil.minutesBetween(latestEntity.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC));
-
-            if (timeDifference <= CACHE_INVALIDATION_TIME) {
-                return formColletion(messageEntities);
+            if (params != null && params.containsKey("date")) {
+                date = LocalDate.parse((String) params.get("date"));
+            } else {
+                date = LocalDate.now(ZoneOffset.UTC);
             }
+
+            List<MessageEntity> messageEntities = messageRepository.getByDate(date);
+            if (messageEntities.size() > 0 && !hasExpired(messageEntities)) {
+                return formCollection(messageEntities);
+            }
+
+            //cleans cache before storing
+            messageRepository.removeByChannelId(to);
         }
 
         MessageCollection collection = super.listMessages(userId, to, recipientType, params);
@@ -57,7 +59,6 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
     }
 
     //TODO: for now only works for channels, make it work for contacts too
-    //TODO: get correct sender
     @Override
     public SentMessage postMessage(String message, String to, int recipientType) throws InvalidComponentException {
         getUser();
@@ -94,7 +95,7 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
         messageRepository.remove(messageId);
     }
 
-    private MessageCollection formColletion(List<MessageEntity> messages) {
+    private MessageCollection formCollection(List<MessageEntity> messages) {
         MessageCollection collection = new MessageCollection();
 
         collection.setDate(LocalDateTime.now().toString());
@@ -164,6 +165,17 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
         }
 
         return entities;
+    }
+
+    private boolean hasExpired(List<MessageEntity> messageEntities) {
+        for (MessageEntity messageEntity : messageEntities) {
+            long timeDifference = DateUtil.minutesBetween(messageEntity.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC));
+            if (timeDifference > CACHE_INVALIDATION_TIME) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
