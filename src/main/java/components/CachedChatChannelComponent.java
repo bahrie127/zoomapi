@@ -112,11 +112,21 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
     }
 
 
-    // TODO: Need to figure out how to cache channel members when email is the only thing provided
-    @Override
+    //    TODO: THIS SHOULD WORK IF JOINING PUBLIC CHANNEL
     public JoinedMember joinChannel(String channelId) throws InvalidComponentException {
 
+        User currentUser = this.userComponent.get("me", null);
+        ChannelMember channelMember = new ChannelMember();
         JoinedMember joinedMember = super.joinChannel(channelId);
+
+        channelMember.setId(joinedMember.getId());
+        channelMember.setEmail(currentUser.getEmail());
+        channelMember.setFirstName(currentUser.getFirstName());
+        channelMember.setLastName(currentUser.getFirstName());
+        channelMember.setRole("member");
+
+        ChannelMemberEntity channelMemberEntity = memberModelToEntity(channelMember, channelId);
+        this.channelMemberRepository.save(channelMemberEntity);
         return super.joinChannel(channelId);
     }
 
