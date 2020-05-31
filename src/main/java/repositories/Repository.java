@@ -10,6 +10,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -24,7 +25,6 @@ public class Repository<T, K> {
     private Class entityClass;
     private String tableName;
     private String idFieldName;
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public Repository(Class<T> entityClass) throws InvalidEntityException {
 
@@ -58,14 +58,14 @@ public class Repository<T, K> {
         }
     }
 
-    public void save(T entity) {
+    public void save(List<T> entities) {
         try {
             connect();
 
+            // forms sql string
+            boolean firstField = true;
             StringBuilder sqlBuilder = new StringBuilder("INSERT OR REPLACE INTO ");
             StringBuilder valuesBuilder = new StringBuilder();
-            List<Object> values = new ArrayList<>();
-            boolean firstField = true;
 
             sqlBuilder.append(this.tableName);
             sqlBuilder.append("(");
@@ -80,8 +80,7 @@ public class Repository<T, K> {
 
                 sqlBuilder.append(toSQLColumnName(field));
                 valuesBuilder.append("?");
-                field.setAccessible(true);
-                values.add(field.get(entity));
+
             }
 
             sqlBuilder.append(") VALUES (");
@@ -90,23 +89,33 @@ public class Repository<T, K> {
 
             PreparedStatement statement = connection.prepareStatement(sqlBuilder.toString());
 
-            for (int i = 0; i < values.size(); i++) {
-                Object value = values.get(i);
+            //prepares values
+            for (T entity : entities) {
+                int i = 1;
+                for (Field field : fields) {
+                    field.setAccessible(true);
+                    Object value = field.get(entity);
 
-                if (value.getClass().equals(LocalDateTime.class)) {
-                    value = ((LocalDateTime) value).format(dateTimeFormatter);
+                    if (value != null && value.getClass().equals(LocalDateTime.class)) {
+                        value = DateUtil.localDateTimeToString((LocalDateTime) value);
+                    }
 
+                    statement.setObject(i , value);
+                    i++;
                 }
-
-                statement.setObject(i + 1, value);
+                statement.addBatch();
             }
 
-            statement.executeUpdate();
-        } catch (IllegalAccessException | SQLException exception) {
+            statement.executeBatch();
+        } catch (SQLException | IllegalAccessException exception) {
             logger.log(Level.WARNING, exception.getMessage());
         }
 
         close();
+    }
+
+    public void save(T entity) {
+        save(new ArrayList<>(Arrays.asList(entity)));
     }
 
     public Optional<T> findById(K id) {
@@ -200,7 +209,6 @@ public class Repository<T, K> {
                 }
 
                 sqlBuilder.append(generateColumn(field));
-
             }
 
             sqlBuilder.append(");");
@@ -290,7 +298,7 @@ public class Repository<T, K> {
 
                 Object value = resultSet.getObject(fieldName);
                 if (field.getType().equals(LocalDateTime.class)) {
-                    value = LocalDateTime.parse((String) value, dateTimeFormatter);
+                    value = DateUtil.parseLocalDateTime((String) value);
                 }
 
                 field.set(entity, value);
