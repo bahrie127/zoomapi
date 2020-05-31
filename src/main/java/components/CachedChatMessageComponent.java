@@ -1,5 +1,6 @@
 package components;
 
+import com.google.gson.Gson;
 import entities.MessageEntity;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
@@ -18,9 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CachedChatMessageComponent {
+public class CachedChatMessageComponent extends ChatMessageComponent {
 
-    private ChatMessageComponent chatMessageComponent = new ChatMessageComponent();
     private UserComponent userComponent = new UserComponent();
     private MessageRepository messageRepository;
     private String sender;
@@ -30,12 +30,12 @@ public class CachedChatMessageComponent {
         this.messageRepository = new MessageRepository();
     }
 
-    //TODO: save messages that are fetched from Zoom
+    @Override
     public MessageCollection listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InvalidComponentException {
         LocalDate date;
 
         if (params != null && params.containsKey("date")) {
-            date = (LocalDate) params.get("date");
+            date = LocalDate.parse((String) params.get("date"));
         } else {
             date = LocalDate.now(ZoneOffset.UTC);
         }
@@ -43,32 +43,37 @@ public class CachedChatMessageComponent {
         List<MessageEntity> messageEntities = messageRepository.getByDate(date);
         if (messageEntities.size() > 0) {
             MessageEntity latestEntity = messageEntities.get(0);
-            long timeDifference = DateUtil.minutesBetween(LocalDateTime.now(ZoneOffset.UTC), latestEntity.getCachedDate());
+            long timeDifference = DateUtil.minutesBetween(latestEntity.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC));
 
             if (timeDifference <= CACHE_INVALIDATION_TIME) {
                 return formColletion(messageEntities);
             }
         }
 
-        return chatMessageComponent.listMessages(userId, to, recipientType, params);
+        MessageCollection collection = super.listMessages(userId, to, recipientType, params);
+        messageRepository.save(createEntityList(collection.getMessages(), to));
+
+        return collection;
     }
 
     //TODO: for now only works for channels, make it work for contacts too
     //TODO: get correct sender
+    @Override
     public SentMessage postMessage(String message, String to, int recipientType) throws InvalidComponentException {
         getUser();
 
-        SentMessage sentMessage = chatMessageComponent.postMessage(message, to, recipientType);
+        SentMessage sentMessage = super.postMessage(message, to, recipientType);
         messageRepository.save(createEntity(sentMessage.getId(), message, to));
 
         return sentMessage;
     }
 
     //TODO: check timestamp if it is correct
+    @Override
     public void putMessage(String messageId, String message, String to, int recipientType) throws InvalidComponentException {
         getUser();
 
-        chatMessageComponent.putMessage(messageId, message, to, recipientType);
+        super.putMessage(messageId, message, to, recipientType);
 
         Optional<MessageEntity> optionalMessageEntity = messageRepository.findById(messageId);
 
@@ -82,8 +87,10 @@ public class CachedChatMessageComponent {
         }
 
     }
+
+    @Override
     public void deleteMessage(String messageId, String to, int recipientType) throws InvalidComponentException {
-        chatMessageComponent.deleteMessage(messageId, to, recipientType);
+        super.deleteMessage(messageId, to, recipientType);
         messageRepository.remove(messageId);
     }
 
@@ -137,6 +144,26 @@ public class CachedChatMessageComponent {
         messageEntity.setCachedDate(date);
 
         return messageEntity;
+    }
+
+    private List<MessageEntity> createEntityList(List<Message> messages, String channelId) {
+        List<MessageEntity> entities = new ArrayList<>();
+
+        for (Message message : messages) {
+            MessageEntity entity = new MessageEntity();
+
+            entity.setId(message.getId());
+            entity.setSender(message.getSender());
+            entity.setMessage(message.getMessage());
+            entity.setDateTime(DateUtil.dateToLocalDateTime(message.getDateTime()));
+            entity.setTimestamp(message.getTimestamp());
+            entity.setCachedDate(LocalDateTime.now(ZoneOffset.UTC));
+            entity.setChannelId(channelId);
+
+            entities.add(entity);
+        }
+
+        return entities;
     }
 
 }

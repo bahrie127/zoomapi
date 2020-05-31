@@ -8,14 +8,12 @@ import models.*;
 import repositories.ChannelMemberRepository;
 import repositories.ChannelRepository;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CachedChatChannelComponent {
+public class CachedChatChannelComponent extends ChatChannelComponent {
 
-    private ChatChannelComponent chatChannelComponent = new ChatChannelComponent();
     private ChannelRepository channelRepository;
     private UserComponent userComponent = new UserComponent();
     private ChannelMemberRepository channelMemberRepository = new ChannelMemberRepository();
@@ -24,19 +22,21 @@ public class CachedChatChannelComponent {
         this.channelRepository = new ChannelRepository();
     }
 
+    @Override
     public ChannelCollection listChannels(Map<String, Object> params) throws InvalidComponentException {
 
-        ChannelCollection channelCollection = chatChannelComponent.listChannels(params);
+        ChannelCollection channelCollection = super.listChannels(params);
         for (Channel channel : channelCollection.getChannels()) {
             ChannelEntity channelEntity = modelToEntity(channel);
             this.channelRepository.save(channelEntity);
         }
 
-        return chatChannelComponent.listChannels(params);
+        return super.listChannels(params);
     }
 
+    @Override
     public Channel createChannel(String name, int type, List<String> members) throws InvalidComponentException {
-        Channel channel = chatChannelComponent.createChannel(name, type, members);
+        Channel channel = super.createChannel(name, type, members);
         ChannelEntity channelEntity = modelToEntity(channel);
 
         this.channelRepository.save(channelEntity);
@@ -44,6 +44,7 @@ public class CachedChatChannelComponent {
         return channel;
     }
 
+    @Override
     public Channel getChannel(String channelId) throws InvalidComponentException {
         Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
 
@@ -54,7 +55,7 @@ public class CachedChatChannelComponent {
             return cachedChannel;
         }
 
-        Channel channel = chatChannelComponent.getChannel(channelId);
+        Channel channel = super.getChannel(channelId);
         ChannelEntity channelEntity = modelToEntity(channel);
 
         this.channelRepository.save(channelEntity);
@@ -62,15 +63,16 @@ public class CachedChatChannelComponent {
         return channel;
     }
 
-
+    @Override
     public void deleteChannel(String channelId) throws InvalidComponentException {
-        chatChannelComponent.deleteChannel(channelId);
+        super.deleteChannel(channelId);
         this.channelRepository.remove(channelId);
     }
 
+    @Override
     public void updateChannel(String channelId, String name) throws InvalidComponentException {
 
-        chatChannelComponent.updateChannel(channelId, name);
+        super.updateChannel(channelId, name);
 
         Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
 
@@ -81,19 +83,20 @@ public class CachedChatChannelComponent {
         }
     }
 
+    @Override
     public ChannelMemberCollection listMembers(String channelId, Map<String, Object> params) throws InvalidComponentException {
-        ChannelMemberCollection channelMemberCollection = chatChannelComponent.listMembers(channelId, params);
+        ChannelMemberCollection channelMemberCollection = super.listMembers(channelId, params);
 
         for(ChannelMember member: channelMemberCollection.getMembers()) {
             ChannelMemberEntity channelMemberEntity = memberModelToEntity(member, channelId);
             this.channelMemberRepository.save(channelMemberEntity);
         }
 
-        return chatChannelComponent.listMembers(channelId, params);
+        return super.listMembers(channelId, params);
     }
 
-
-//    TODO: Need to figure out how to cache channel members when email is the only thing provided
+    //TODO: Need to figure out how to cache channel members when email is the only thing provided
+    @Override
     public InvitedChannelMembers inviteMembers(String channelId, List<String> members) throws InvalidComponentException {
 
         Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
@@ -105,7 +108,7 @@ public class CachedChatChannelComponent {
             for (String email : members) {
 
         }
-        return chatChannelComponent.inviteMembers(channelId, members);
+        return super.inviteMembers(channelId, members);
     }
 
 
@@ -114,7 +117,7 @@ public class CachedChatChannelComponent {
 
         User currentUser = this.userComponent.get("me", null);
         ChannelMember channelMember = new ChannelMember();
-        JoinedMember joinedMember = chatChannelComponent.joinChannel(channelId);
+        JoinedMember joinedMember = super.joinChannel(channelId);
 
         channelMember.setId(joinedMember.getId());
         channelMember.setEmail(currentUser.getEmail());
@@ -124,16 +127,16 @@ public class CachedChatChannelComponent {
 
         ChannelMemberEntity channelMemberEntity = memberModelToEntity(channelMember, channelId);
         this.channelMemberRepository.save(channelMemberEntity);
-        return chatChannelComponent.joinChannel(channelId);
+        return super.joinChannel(channelId);
     }
 
-
+    @Override
     public void leaveChannel(String channelId) throws InvalidComponentException {
 
         User currentUser = this.userComponent.get("me", null);
         String memberId = "";
 
-        ChannelMemberCollection channelMemberCollection = chatChannelComponent.listMembers(channelId, null);
+        ChannelMemberCollection channelMemberCollection = super.listMembers(channelId, null);
 
         for(ChannelMember member: channelMemberCollection.getMembers()) {
             if(member.getEmail().equals(currentUser.getEmail()))
@@ -141,15 +144,14 @@ public class CachedChatChannelComponent {
         }
 
         this.channelMemberRepository.remove(memberId);
-        chatChannelComponent.leaveChannel(channelId);
+        super.leaveChannel(channelId);
     }
 
-
+    @Override
     public void removeMember(String channelId, String memberId) throws InvalidComponentException {
         this.channelMemberRepository.remove(memberId);
-        chatChannelComponent.removeMember(channelId, memberId);
+        super.removeMember(channelId, memberId);
     }
-
 
     private Channel entityToModel(ChannelEntity entity) {
         Channel channel = new Channel();

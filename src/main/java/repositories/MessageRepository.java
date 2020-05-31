@@ -2,6 +2,7 @@ package repositories;
 
 import entities.MessageEntity;
 import exceptions.InvalidEntityException;
+import util.DateUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,7 +14,9 @@ public class MessageRepository extends Repository<MessageEntity, String> {
     }
 
     public List<MessageEntity> getByDate(LocalDate localDate) {
-        String where = "where date_time BETWEEN '" + localDate.atTime(LocalTime.MIN).toString() + "' AND '" + localDate.atTime(LocalTime.MAX).toString() + "' ORDER BY date_time asc;";
+        String dateMin = DateUtil.localDateTimeToString(localDate.atTime(LocalTime.MIN));
+        String dateMax = DateUtil.localDateTimeToString(localDate.atTime(LocalTime.MAX));
+        String where = "date_time BETWEEN '" + dateMin + "' AND '" + dateMax + "' ORDER BY date_time asc;";
         return get(where);
     }
 }
