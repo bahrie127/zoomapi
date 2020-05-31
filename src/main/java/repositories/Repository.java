@@ -2,11 +2,13 @@ package repositories;
 
 import annonations.*;
 import exceptions.InvalidEntityException;
+import util.DateUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,7 @@ public class Repository<T, K> {
     private Class entityClass;
     private String tableName;
     private String idFieldName;
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public Repository(Class<T> entityClass) throws InvalidEntityException {
 
@@ -29,16 +32,14 @@ public class Repository<T, K> {
             throw new InvalidEntityException("Entity is missing table name.");
         }
 
-        this.connect();
-
         this.entityClass = entityClass;
         this.fields = entityClass.getDeclaredFields();
         this.tableName = entityClass.getDeclaredAnnotation(Table.class).value();
         createTable();
     }
 
-    private void connect() {
-        if (connection == null) {
+    private void connect() throws SQLException {
+        if (connection == null || connection.isClosed()) {
             try {
                 connection = DriverManager.getConnection(DATABASE_URL);
             } catch (SQLException e) {
@@ -58,15 +59,17 @@ public class Repository<T, K> {
     }
 
     public void save(T entity) {
-        StringBuilder sqlBuilder = new StringBuilder("INSERT OR REPLACE INTO ");
-        StringBuilder valuesBuilder = new StringBuilder();
-        List<Object> values = new ArrayList<>();
-        boolean firstField = true;
-
-        sqlBuilder.append(this.tableName);
-        sqlBuilder.append("(");
-
         try {
+            connect();
+
+            StringBuilder sqlBuilder = new StringBuilder("INSERT OR REPLACE INTO ");
+            StringBuilder valuesBuilder = new StringBuilder();
+            List<Object> values = new ArrayList<>();
+            boolean firstField = true;
+
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append("(");
+
             for (Field field : fields) {
                 if (firstField) {
                     firstField = false;
@@ -88,47 +91,62 @@ public class Repository<T, K> {
             PreparedStatement statement = connection.prepareStatement(sqlBuilder.toString());
 
             for (int i = 0; i < values.size(); i++) {
-                statement.setObject(i + 1, values.get(i));
+                Object value = values.get(i);
+
+                if (value.getClass().equals(LocalDateTime.class)) {
+                    value = ((LocalDateTime) value).format(dateTimeFormatter);
+
+                }
+
+                statement.setObject(i + 1, value);
             }
 
             statement.executeUpdate();
         } catch (IllegalAccessException | SQLException exception) {
             logger.log(Level.WARNING, exception.getMessage());
         }
+
+        close();
     }
 
     public Optional<T> findById(K id) {
-        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
-        sqlBuilder.append(this.tableName);
-        sqlBuilder.append(" WHERE ");
-        sqlBuilder.append(this.idFieldName);
-        sqlBuilder.append(" = ?;");
-
         try {
+            connect();
+
+            StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append(" WHERE ");
+            sqlBuilder.append(this.idFieldName);
+            sqlBuilder.append(" = ?;");
+
             PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
             preparedStatement.setObject(1, id);
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return Optional.of(entryToEntity(resultSet));
+                T entity = entryToEntity(resultSet);
+                close();
+                return Optional.of(entity);
             }
 
         } catch (SQLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             logger.warning(exception.getMessage());
         }
 
+        close();
         return Optional.ofNullable(null);
     }
 
     public List<T> get(String where) {
         List<T> results = new ArrayList<>();
-
-        StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
-        sqlBuilder.append(this.tableName);
-        sqlBuilder.append(" WHERE ");
-        sqlBuilder.append(where);
-
         try {
+            connect();
+
+            StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append(" WHERE ");
+            sqlBuilder.append(where);
+
             PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -140,18 +158,20 @@ public class Repository<T, K> {
             logger.warning(exception.getMessage());
         }
 
+        close();
         return results;
-
     }
 
     public void remove(K id) {
-        StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ");
-        sqlBuilder.append(this.tableName);
-        sqlBuilder.append(" WHERE ");
-        sqlBuilder.append(this.idFieldName);
-        sqlBuilder.append(" = ?;");
-
         try {
+            connect();
+
+            StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ");
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append(" WHERE ");
+            sqlBuilder.append(this.idFieldName);
+            sqlBuilder.append(" = ?;");
+
             PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
 
             preparedStatement.setObject(1, id);
@@ -159,34 +179,39 @@ public class Repository<T, K> {
         } catch (SQLException exception) {
             logger.warning(exception.getMessage());
         }
+
+        close();
     }
 
     private void createTable() throws InvalidEntityException {
-        StringBuilder sqlBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-        sqlBuilder.append(this.tableName);
-        sqlBuilder.append("(");
-        boolean firstField = true;
+        try {
+            connect();
 
-        for (Field field : this.fields) {
-            if (firstField) {
-                firstField = false;
-            } else {
-                sqlBuilder.append(",");
+            StringBuilder sqlBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append("(");
+            boolean firstField = true;
+
+            for (Field field : this.fields) {
+                if (firstField) {
+                    firstField = false;
+                } else {
+                    sqlBuilder.append(",");
+                }
+
+                sqlBuilder.append(generateColumn(field));
+
             }
 
-            sqlBuilder.append(generateColumn(field));
+            sqlBuilder.append(");");
 
-        }
-
-        sqlBuilder.append(");");
-
-        try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(sqlBuilder.toString());
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
+        close();
     }
 
     private String generateColumn(Field field) throws InvalidEntityException {
@@ -265,7 +290,7 @@ public class Repository<T, K> {
 
                 Object value = resultSet.getObject(fieldName);
                 if (field.getType().equals(LocalDateTime.class)) {
-                    value = LocalDateTime.parse((String) value);
+                    value = LocalDateTime.parse((String) value, dateTimeFormatter);
                 }
 
                 field.set(entity, value);
