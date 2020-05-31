@@ -5,6 +5,7 @@ import components.*;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
 import listeners.ChatListener;
+import models.ChannelMember;
 import services.ChatService;
 
 public class ZoomClient {
@@ -15,6 +16,7 @@ public class ZoomClient {
     private UserComponent user;
     private CachedChatChannelComponent chatChannels;
     private CachedChatMessageComponent chatMessages;
+    private ChannelMember channelMember;
     private MeetingComponent meeting;
     private RecordingComponent recording;
     private ReportComponent report;
@@ -33,6 +35,7 @@ public class ZoomClient {
         this.user = new UserComponent();
         this.chatChannels = new CachedChatChannelComponent();
         this.chatMessages = new CachedChatMessageComponent();
+        this.channelMember = new ChannelMember();
         this.meeting = new MeetingComponent();
         this.recording = new RecordingComponent();
         this.report = new ReportComponent();
@@ -75,6 +78,10 @@ public class ZoomClient {
 
     public CachedChatMessageComponent getChatMessages() {
         return chatMessages;
+    }
+
+    public ChannelMember getChannelMember() {
+        return channelMember;
     }
 
     public MeetingComponent getMeeting() {
