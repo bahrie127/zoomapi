@@ -7,6 +7,8 @@ import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
 import models.Channel;
+import models.ChannelMember;
+import models.ChannelMemberCollection;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -44,15 +46,22 @@ public class OAuthBot {
 
         Channel channel = client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("rafael.bellotti@gmail.com")));
 
+
         client.getChatChannels().listMembers(channel.getId(), null);
         System.out.println(gson.toJson(client.getChatChannels().listMembers(channel.getId(),null)));
 
-        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
+        ChannelMemberCollection channelMemberColection = client.getChatChannels().listMembers((channel.getId()), null);
 
-        client.getChatChannels().updateChannel(channel.getId(),"updated cached channel");
-        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
+        ChannelMember channelMember = channelMemberColection.getMembers().get(0);
 
+        client.getChatChannels().removeMember(channel.getId(), channelMember.getId());
 
-        client.getChatChannels().deleteChannel(channel.getId());
+//        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
+//
+//        client.getChatChannels().updateChannel(channel.getId(),"updated cached channel");
+//        System.out.println(gson.toJson(client.getChatChannels().getChannel(channel.getId())));
+//
+//
+//        client.getChatChannels().deleteChannel(channel.getId());
     }
 }

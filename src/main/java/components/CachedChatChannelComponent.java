@@ -91,6 +91,34 @@ public class CachedChatChannelComponent {
         return chatChannelComponent.listMembers(channelId, params);
     }
 
+//    TODO: Need to figure out how to cache channel members when email is the only thing provided
+    public InvitedChannelMembers inviteMembers(String channelId, List<String> members) throws InvalidComponentException {
+
+        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
+
+        if (optionalCachedEntity.isPresent()) {
+            ChannelEntity cachedEntity = optionalCachedEntity.get();
+            Channel cachedChannel = entityToModel(cachedEntity);
+        }
+            for (String email : members) {
+
+        }
+
+        return chatChannelComponent.inviteMembers(channelId, members);
+    }
+
+    //    TODO: Need to figure out how to cache channel members when email is the only thing provided
+    public JoinedMember joinChannel(String channelId) throws InvalidComponentException {
+
+        JoinedMember joinedMember = chatChannelComponent.joinChannel(channelId);
+        return chatChannelComponent.joinChannel(channelId);
+    }
+
+    public void removeMember(String channelId, String memberId) throws InvalidComponentException {
+        this.channelMemberRepository.remove(memberId);
+        chatChannelComponent.removeMember(channelId, memberId);
+    }
+
 
     private Channel entityToModel(ChannelEntity entity) {
         Channel channel = new Channel();
