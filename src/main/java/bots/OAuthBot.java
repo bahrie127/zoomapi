@@ -7,6 +7,7 @@ import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
 import models.Channel;
+import models.SentMessage;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
@@ -14,7 +15,8 @@ import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,25 +41,29 @@ public class OAuthBot {
         Map<String, Object> params = new HashMap<>();
         params.put("page_size", 100);
 
-        //System.out.println(gson.toJson(client.getChatChannels().listChannels(params)));
+        //Messages test
+        /*System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "109ab13498c64fd5911a42be1076ea6b", 1, params)));
+        SentMessage message = client.getChatMessages().postMessage("hello", "109ab13498c64fd5911a42be1076ea6b", 1);
 
-        System.out.println(gson.toJson(client.getChatChannels().listMembers("109ab13498c64fd5911a42be1076ea6b", params)));
+        client.getChatMessages().putMessage(message.getId(), "edit", "109ab13498c64fd5911a42be1076ea6b", 1);
+        client.getChatMessages().deleteMessage(message.getId(), "109ab13498c64fd5911a42be1076ea6b", 1);*/
 
-        /*LocalDate date = LocalDate.of(2020, 05, 19);
-        Map<String, Object> params = new HashMap<>();
-        params.put("date", date.toString());
+        //Channels test
+        Channel channel = client.getChatChannels().createChannel("testerchannel", 1, new ArrayList<>());
+        /*System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
+        System.out.println(gson.toJson(client.getChatChannels().getChannel("109ab13498c64fd5911a42be1076ea6b")));
+        Channel channel = client.getChatChannels().createChannel("lalala", 1, new ArrayList<>());
+        client.getChatChannels().updateChannel(channel.getId(), "lululu");
+        client.getChatChannels().deleteChannel(channel.getId());*/
 
-        System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "109ab13498c64fd5911a42be1076ea6b", 1, params)));*/
-
-        /*client.getChatListener().onNewMessage("test", (message) -> System.out.println("Message received: " + gson.toJson(message)));
-        client.getChatListener().onMessageUpdate("test", (message) -> System.out.println("Message updated: " + gson.toJson(message)));
-        client.getChatListener().onNewMember("test", (member) -> System.out.println("New member: " + gson.toJson(member)));*/
-
-        //client.getChatChannels().createChannel("cached channel", 1, new ArrayList<String>(Arrays.asList("nicalgrant@gmail.com")));
-        //System.out.println(gson.toJson(client.getChatChannels().getChannel("97601359-20b6-4b64-a445-177b3231b1c0")));
+        //Members test
+        System.out.println(gson.toJson(client.getChatChannels().listMembers(channel.getId(), null)));
+        client.getChatChannels().inviteMembers(channel.getId(), new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
+        client.getChatChannels().leaveChannel(channel.getId());
+        System.out.println(gson.toJson(client.getChatChannels().listMembers(channel.getId(), null)));
+        client.getChatChannels().joinChannel(channel.getId());
     }
 }
 
 // Test channel id: 109ab13498c64fd5911a42be1076ea6b
 //TODO: work with concurrency
-//TODO: user id?

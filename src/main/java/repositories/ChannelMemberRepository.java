@@ -12,14 +12,15 @@ public class ChannelMemberRepository extends Repository<ChannelMemberEntity, Str
         super(ChannelMemberEntity.class);
     }
 
-    public List<ChannelMemberEntity> findByChannelId(String channelId) {
-        String where = "channel_id = '" + channelId + "';";
+    public List<ChannelMemberEntity> findByChannelIdAndClientId(String channelId, String clientId) {
+        String where = "channel_id = '" + channelId + "' AND client_id = '" + clientId + "';";
         return get(where);
     }
 
-    public void removeByChannelId(String channelId) {
+    public void removeByChannelIdAndClientId(String channelId, String clientId) {
         Map<String, Object> params = new HashMap<>();
         params.put("channel_id", channelId);
+        params.put("client_id", clientId);
 
         removeByCondition(params);
     }

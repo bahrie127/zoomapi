@@ -1,6 +1,7 @@
 package repositories;
 
 import annonations.*;
+import config.DatabaseSource;
 import exceptions.InvalidEntityException;
 import util.DateUtil;
 
@@ -124,7 +125,7 @@ public class Repository<T, K> {
             sqlBuilder.append(this.idFieldName);
             sqlBuilder.append(" = ?;");
 
-            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
             preparedStatement.setObject(1, id);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -155,7 +156,7 @@ public class Repository<T, K> {
                 sqlBuilder.append(where);
             }
 
-            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
 
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -184,7 +185,7 @@ public class Repository<T, K> {
             sqlBuilder.append(this.idFieldName);
             sqlBuilder.append(" = ?;");
 
-            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
 
             preparedStatement.setObject(1, id);
             preparedStatement.executeUpdate();
@@ -203,8 +204,14 @@ public class Repository<T, K> {
             sqlBuilder.append(this.tableName);
             sqlBuilder.append(" WHERE ");
             List<Object> values = new ArrayList<>();
+            boolean firstValue = true;
 
             for (Map.Entry<String, Object> entry : params.entrySet()) {
+                if (firstValue) {
+                    firstValue = false;
+                } else {
+                    sqlBuilder.append(" AND ");
+                }
                 sqlBuilder.append(entry.getKey());
                 sqlBuilder.append(" = ? ");
                 values.add(entry.getValue());
@@ -212,7 +219,7 @@ public class Repository<T, K> {
 
             sqlBuilder.append(";");
 
-            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
 
             int i = 1;
             for (Object value : values) {
@@ -236,7 +243,7 @@ public class Repository<T, K> {
             sqlBuilder.append(this.tableName);
             sqlBuilder.append(";");
 
-            PreparedStatement preparedStatement = this.connection.prepareStatement(sqlBuilder.toString());
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
 
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
@@ -284,7 +291,7 @@ public class Repository<T, K> {
         String columnName = toSQLColumnName(field);
         StringBuilder columnBuilder = new StringBuilder(columnName);
 
-        columnBuilder.append(" " + toSQLDataType(field.getType()));
+        columnBuilder.append(" " + toSQLDataType(field));
 
         if (field.isAnnotationPresent(PrimaryKey.class)) {
             columnBuilder.append(" PRIMARY KEY");
@@ -311,9 +318,16 @@ public class Repository<T, K> {
         return field.getName();
     }
 
-    private String toSQLDataType(Class<?> type) {
+    private String toSQLDataType(Field field) {
+        Class<?> type = field.getType();
+
         if (type.equals(String.class)) {
-            return "VARCHAR(255)";
+            if (field.isAnnotationPresent(Size.class)) {
+                int size = field.getAnnotation(Size.class).value();
+                return "VARCHAR(" + size + ")";
+            }
+
+            return "TEXT";
         } else if (type.equals(Integer.class)) {
             return "INTEGER";
         } else if (type.equals(LocalDateTime.class)) {

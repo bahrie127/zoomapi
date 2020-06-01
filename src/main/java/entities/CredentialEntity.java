@@ -1,16 +1,13 @@
 package entities;
 
-import annonations.Column;
-import annonations.NotNull;
-import annonations.PrimaryKey;
-import annonations.Table;
+import annonations.*;
 
 import java.time.LocalDateTime;
 
 @Table("credentials")
 public class CredentialEntity {
 
-    public CredentialEntity() {}
+    public CredentialEntity() { }
 
     public CredentialEntity(String clientId, String token, LocalDateTime cachedDate) {
         this.clientId = clientId;
@@ -19,6 +16,7 @@ public class CredentialEntity {
     }
 
     @PrimaryKey
+    @Size(22)
     @Column("client_id")
     private String clientId;
 

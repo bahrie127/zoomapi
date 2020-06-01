@@ -1,7 +1,5 @@
 package components;
 
-import com.google.gson.Gson;
-import entities.ChannelEntity;
 import entities.MessageEntity;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidEntityException;
@@ -26,9 +24,11 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
     private MessageRepository messageRepository;
     private String sender;
     private static final long CACHE_INVALIDATION_TIME = 20;
+    private String clientId;
 
-    public CachedChatMessageComponent() throws InvalidEntityException {
+    public CachedChatMessageComponent(String clientId) throws InvalidEntityException {
         this.messageRepository = new MessageRepository();
+        this.clientId = clientId;
     }
 
     @Override
@@ -43,13 +43,13 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
                 date = LocalDate.now(ZoneOffset.UTC);
             }
 
-            List<MessageEntity> messageEntities = messageRepository.getByDate(date);
+            List<MessageEntity> messageEntities = messageRepository.getByDateAndClientId(date, clientId);
             if (messageEntities.size() > 0 && !hasExpired(messageEntities)) {
                 return formCollection(messageEntities);
             }
 
             //cleans cache before storing
-            messageRepository.removeByChannelId(to);
+            messageRepository.removeByChannelIdAndClientId(to, this.clientId);
         }
 
         MessageCollection collection = super.listMessages(userId, to, recipientType, params);
@@ -115,7 +115,13 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
             model.setId(entity.getId());
             model.setMessage(entity.getMessage());
             model.setDateTime(DateUtil.localDateTimeToDate(entity.getDateTime()));
-            model.setSender(entity.getSender());
+
+            if (entity.getSender() == null) {
+                model.setSender(this.sender);
+            } else {
+                model.setSender(entity.getSender());
+            }
+
             model.setTimestamp(entity.getTimestamp());
 
             models.add(model);
@@ -143,23 +149,31 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
         messageEntity.setTimestamp(date.toInstant(ZoneOffset.UTC).toEpochMilli());
         messageEntity.setChannelId(to);
         messageEntity.setCachedDate(date);
+        messageEntity.setClientId(clientId);
 
         return messageEntity;
     }
 
-    private List<MessageEntity> createEntityList(List<Message> messages, String channelId) {
+    private List<MessageEntity> createEntityList(List<Message> messages, String channelId) throws InvalidComponentException {
         List<MessageEntity> entities = new ArrayList<>();
 
         for (Message message : messages) {
             MessageEntity entity = new MessageEntity();
 
             entity.setId(message.getId());
-            entity.setSender(message.getSender());
+
+            if (message.getSender() == null) {
+                getUser();
+                entity.setSender(this.sender);
+            } else {
+                entity.setSender(message.getSender());
+            }
             entity.setMessage(message.getMessage());
             entity.setDateTime(DateUtil.dateToLocalDateTime(message.getDateTime()));
             entity.setTimestamp(message.getTimestamp());
             entity.setCachedDate(LocalDateTime.now(ZoneOffset.UTC));
             entity.setChannelId(channelId);
+            entity.setClientId(this.clientId);
 
             entities.add(entity);
         }

@@ -33,8 +33,8 @@ public class ZoomClient {
         apiClient.setTimeout(timeout);
 
         this.user = new UserComponent();
-        this.chatChannels = new CachedChatChannelComponent();
-        this.chatMessages = new CachedChatMessageComponent();
+        this.chatChannels = new CachedChatChannelComponent(apiKey);
+        this.chatMessages = new CachedChatMessageComponent(apiKey);
         this.channelMember = new ChannelMember();
         this.meeting = new MeetingComponent();
         this.recording = new RecordingComponent();

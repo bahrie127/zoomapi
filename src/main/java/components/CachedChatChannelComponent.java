@@ -21,23 +21,25 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
     private ChannelRepository channelRepository;
     private ChannelMemberRepository channelMemberRepository = new ChannelMemberRepository();
     private static final long CACHE_INVALIDATION_TIME = 20;
+    private String clientId;
 
-    public CachedChatChannelComponent() throws InvalidEntityException {
+    public CachedChatChannelComponent(String clientId) throws InvalidEntityException {
         this.channelRepository = new ChannelRepository();
+        this.clientId = clientId;
     }
 
     @Override
     public ChannelCollection listChannels(Map<String, Object> params) throws InvalidComponentException {
 
-        if (!params.containsKey("next_page_token")) {
-            List<ChannelEntity> cachedChannels = channelRepository.findAll();
+        if (params == null || !params.containsKey("next_page_token")) {
+            List<ChannelEntity> cachedChannels = channelRepository.findByClientId(clientId);
 
             if (cachedChannels.size() > 0 && !hasCachedChannelsExpired(cachedChannels)) {
                 return formChannelCollection(cachedChannels);
             }
 
             //Makes sure the cache will only have the correct channels
-            channelRepository.removeAll();
+            channelRepository.removeByClientId(clientId);
         }
 
         ChannelCollection channelCollection = super.listChannels(params);
@@ -99,18 +101,17 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
         }
     }
 
-    //TODO: get from cache
     @Override
     public ChannelMemberCollection listMembers(String channelId, Map<String, Object> params) throws InvalidComponentException {
-        if (!params.containsKey("next_page_token")) {
-            List<ChannelMemberEntity> cachedChannelMembers = channelMemberRepository.findByChannelId(channelId);
+        if (params == null || !params.containsKey("next_page_token")) {
+            List<ChannelMemberEntity> cachedChannelMembers = channelMemberRepository.findByChannelIdAndClientId(channelId, clientId);
 
             if (cachedChannelMembers.size() > 0 && !hasCachedMembersExpired(cachedChannelMembers)) {
                 return formMemberCollection(cachedChannelMembers);
             }
 
             //Makes sure the cache will only have the correct channels
-            channelMemberRepository.removeByChannelId(channelId);
+            channelMemberRepository.removeByChannelIdAndClientId(channelId, clientId);
         }
 
         ChannelMemberCollection channelMemberCollection = super.listMembers(channelId, params);
@@ -127,17 +128,6 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
     //TODO: Need to figure out how to cache channel members when email is the only thing provided
     @Override
     public InvitedChannelMembers inviteMembers(String channelId, List<String> members) throws InvalidComponentException {
-
-        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
-
-        if (optionalCachedEntity.isPresent()) {
-            ChannelEntity cachedEntity = optionalCachedEntity.get();
-            Channel cachedChannel = channelEntityToModel(cachedEntity);
-        }
-
-        for (String email : members) {
-
-        }
         return super.inviteMembers(channelId, members);
     }
 
@@ -177,6 +167,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
         entity.setName(model.getName());
         entity.setType(model.getType());
         entity.setCachedDate(LocalDateTime.now(ZoneOffset.UTC));
+        entity.setClientId(this.clientId);
 
         return entity;
     }
@@ -191,6 +182,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
         entity.setRole(model.getRole());
         entity.setChannelId(channelId);
         entity.setCachedDate(LocalDateTime.now(ZoneOffset.UTC));
+        entity.setClientId(this.clientId);
 
         return entity;
     }

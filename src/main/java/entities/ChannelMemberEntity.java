@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class ChannelMemberEntity {
 
     @PrimaryKey
+    @Size(22)
     @Column("id")
     private String id;
 
@@ -28,9 +29,15 @@ public class ChannelMemberEntity {
     private String role;
 
     @NotNull
+    @Size(36)
     @Column("channel_id")
-    @ForeignKey(ChannelEntity.class)
     private String channelId;
+
+    @NotNull
+    @Size(22)
+    @Column("client_id")
+    @ForeignKey(CredentialEntity.class)
+    private String clientId;
 
     @NotNull
     @Column("cached_date")
@@ -90,5 +97,13 @@ public class ChannelMemberEntity {
 
     public void setCachedDate(LocalDateTime cachedDate) {
         this.cachedDate = cachedDate;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }

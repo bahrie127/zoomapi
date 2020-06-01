@@ -3,12 +3,12 @@ package entities;
 import annonations.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Table("messages")
 public class MessageEntity {
 
     @PrimaryKey
+    @Size(36)
     @Column("id")
     private String id;
 
@@ -29,9 +29,15 @@ public class MessageEntity {
     private Long timestamp;
 
     @NotNull
+    @Size(36)
     @Column("channel_id")
-    @ForeignKey(ChannelEntity.class)
     private String channelId;
+
+    @NotNull
+    @Size(22)
+    @Column("client_id")
+    @ForeignKey(CredentialEntity.class)
+    private String clientId;
 
     @NotNull
     @Column("cached_date")
@@ -91,5 +97,13 @@ public class MessageEntity {
 
     public void setCachedDate(LocalDateTime cacheDate) {
         this.cachedDate = cacheDate;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 }
