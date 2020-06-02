@@ -1,7 +1,6 @@
 package repositories;
 
 import annonations.*;
-import config.DatabaseSource;
 import exceptions.InvalidEntityException;
 import util.DateUtil;
 
@@ -108,7 +107,6 @@ public class Repository<T, K> {
             logger.log(Level.WARNING, exception.getMessage());
         }
 
-        close();
     }
 
     public void save(T entity) {
@@ -130,16 +128,13 @@ public class Repository<T, K> {
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                T entity = entryToEntity(resultSet);
-                close();
-                return Optional.of(entity);
+                return Optional.of(entryToEntity(resultSet));
             }
 
         } catch (SQLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             logger.warning(exception.getMessage());
         }
 
-        close();
         return Optional.ofNullable(null);
     }
 
@@ -158,6 +153,7 @@ public class Repository<T, K> {
 
             PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
 
+            //logger.info(sqlBuilder.toString());
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 results.add(entryToEntity(resultSet));
@@ -167,7 +163,6 @@ public class Repository<T, K> {
             logger.warning(exception.getMessage());
         }
 
-        close();
         return results;
     }
 
@@ -193,7 +188,23 @@ public class Repository<T, K> {
             logger.warning(exception.getMessage());
         }
 
-        close();
+    }
+
+    protected void removeByCondition(String condition) {
+        try {
+            connect();
+
+            StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ");
+            sqlBuilder.append(this.tableName);
+            sqlBuilder.append(" WHERE ");
+            sqlBuilder.append(condition);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            logger.warning(exception.getMessage());
+        }
     }
 
     protected void removeByCondition(Map<String, Object> params) {
@@ -231,8 +242,6 @@ public class Repository<T, K> {
         } catch (SQLException exception) {
             logger.warning(exception.getMessage());
         }
-
-        close();
     }
 
     public void removeAll() {
@@ -250,7 +259,6 @@ public class Repository<T, K> {
             logger.warning(exception.getMessage());
         }
 
-        close();
     }
 
     private void createTable() throws InvalidEntityException {
@@ -279,8 +287,6 @@ public class Repository<T, K> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        close();
 
         if (idFieldName == null) {
             throw new InvalidEntityException("Missing primary key.");

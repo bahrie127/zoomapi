@@ -20,7 +20,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
 
     private ChannelRepository channelRepository;
     private ChannelMemberRepository channelMemberRepository = new ChannelMemberRepository();
-    private static final long CACHE_INVALIDATION_TIME = 20;
+    private static final long CACHE_INVALIDATION_TIME = 5;
     private String clientId;
 
     public CachedChatChannelComponent(String clientId) throws InvalidEntityException {
@@ -31,7 +31,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
     @Override
     public ChannelCollection listChannels(Map<String, Object> params) throws InvalidComponentException {
 
-        if (params == null || !params.containsKey("next_page_token")) {
+        if (params == null || !params.containsKey("next_page_token") || ((String) params.get("next_page_token")).isEmpty()) {
             List<ChannelEntity> cachedChannels = channelRepository.findByClientId(clientId);
 
             if (cachedChannels.size() > 0 && !hasCachedChannelsExpired(cachedChannels)) {
@@ -44,8 +44,10 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
 
         ChannelCollection channelCollection = super.listChannels(params);
         List<ChannelEntity> entities = new ArrayList<>();
-        for (Channel channel : channelCollection.getChannels()) {
-            entities.add(modelToEntity(channel));
+        if (channelCollection != null) {
+            for (Channel channel : channelCollection.getChannels()) {
+                entities.add(modelToEntity(channel));
+            }
         }
 
         this.channelRepository.save(entities);
@@ -103,7 +105,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
 
     @Override
     public ChannelMemberCollection listMembers(String channelId, Map<String, Object> params) throws InvalidComponentException {
-        if (params == null || !params.containsKey("next_page_token")) {
+        if (params == null || !params.containsKey("next_page_token") || ((String) params.get("next_page_token")).isEmpty()) {
             List<ChannelMemberEntity> cachedChannelMembers = channelMemberRepository.findByChannelIdAndClientId(channelId, clientId);
 
             if (cachedChannelMembers.size() > 0 && !hasCachedMembersExpired(cachedChannelMembers)) {
@@ -251,5 +253,10 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
         collection.setTotalRecords(members.size());
 
         return collection;
+    }
+
+    public void close() {
+        channelRepository.close();
+        channelMemberRepository.close();
     }
 }

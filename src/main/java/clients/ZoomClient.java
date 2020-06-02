@@ -40,8 +40,8 @@ public class ZoomClient {
         this.recording = new RecordingComponent();
         this.report = new ReportComponent();
         this.webinar = new WebinarComponent();
-        this.chat = new ChatService();
-        this.chatListener = new ChatListener();
+        this.chat = new ChatService(this.chatChannels, this.chatMessages);
+        this.chatListener = new ChatListener(this.chat);
     }
 
     public void refreshToken() {}
@@ -54,6 +54,11 @@ public class ZoomClient {
     public void setApiSecret(String apiSecret) {
         this.apiSecret = apiSecret;
         refreshToken();
+    }
+
+    public void close() {
+        this.chatChannels.close();
+        this.chatMessages.close();
     }
 
     public String getApiKey() {

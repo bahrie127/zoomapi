@@ -17,9 +17,9 @@ public class ChatListener extends Listener {
 
     private ChatService chatService;
 
-    public ChatListener() {
+    public ChatListener(ChatService chatService) {
         super();
-        this.chatService = new ChatService();
+        this.chatService = chatService;
     }
 
     public void onNewMessage(String channelName, Consumer<Message> callback) {

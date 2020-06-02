@@ -15,20 +15,20 @@ public class MessageRepository extends Repository<MessageEntity, String> {
         super(MessageEntity.class);
     }
 
-    public List<MessageEntity> getByDateAndClientId(LocalDate localDate, String clientId) {
+    public List<MessageEntity> getByDateAndClientIdAndChannelId(LocalDate localDate, String clientId, String channelId) {
         String dateMin = DateUtil.localDateTimeToString(localDate.atTime(LocalTime.MIN));
         String dateMax = DateUtil.localDateTimeToString(localDate.atTime(LocalTime.MAX));
-        String where = "client_id = '" + clientId + "' AND date_time BETWEEN '"
+        String where = "client_id = '" + clientId + "' AND channel_id = '" + channelId + "' AND date_time BETWEEN '"
                 + dateMin + "' AND '" + dateMax + "' ORDER BY date_time asc;";
         return get(where);
     }
 
-    public void removeByChannelIdAndClientId(String channelId, String clientId) {
-        Map<String, Object> params = new HashMap<>();
+    public void removeByDateAndClientIdAndChannelId(LocalDate localDate, String clientId, String channelId) {
+        String dateMin = DateUtil.localDateTimeToString(localDate.atTime(LocalTime.MIN));
+        String dateMax = DateUtil.localDateTimeToString(localDate.atTime(LocalTime.MAX));
+        String where = "client_id = '" + clientId + "' AND channel_id = '" + channelId + "' AND date_time BETWEEN '"
+                + dateMin + "' AND '" + dateMax + "';";
 
-        params.put("channel_id", channelId);
-        params.put("client_id", clientId);
-
-        removeByCondition(params);
+        removeByCondition(where);
     }
 }

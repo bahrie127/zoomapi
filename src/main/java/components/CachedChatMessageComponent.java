@@ -17,13 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class CachedChatMessageComponent extends ChatMessageComponent {
 
     private UserComponent userComponent = new UserComponent();
+    private Logger logger = Logger.getLogger(this.getClass().getName());
     private MessageRepository messageRepository;
     private String sender;
-    private static final long CACHE_INVALIDATION_TIME = 20;
+    private static final long CACHE_INVALIDATION_TIME = 5;
     private String clientId;
 
     public CachedChatMessageComponent(String clientId) throws InvalidEntityException {
@@ -34,7 +36,7 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
     @Override
     public MessageCollection listMessages(String userId, String to, int recipientType, Map<String, Object> params) throws InvalidComponentException {
 
-        if (!params.containsKey("next_page_token")) {
+        if (params == null || !params.containsKey("next_page_token") || ((String) params.get("next_page_token")).isEmpty()) {
             LocalDate date;
 
             if (params != null && params.containsKey("date")) {
@@ -43,13 +45,16 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
                 date = LocalDate.now(ZoneOffset.UTC);
             }
 
-            List<MessageEntity> messageEntities = messageRepository.getByDateAndClientId(date, clientId);
-            if (messageEntities.size() > 0 && !hasExpired(messageEntities)) {
-                return formCollection(messageEntities);
+            List<MessageEntity> messageEntities = messageRepository.getByDateAndClientIdAndChannelId(date, clientId, to);
+            if (messageEntities.size() > 0) {
+
+                if (!hasExpired(messageEntities)) {
+                    return formCollection(messageEntities);
+                }
+
+                messageRepository.removeByDateAndClientIdAndChannelId(date, clientId, to);
             }
 
-            //cleans cache before storing
-            messageRepository.removeByChannelIdAndClientId(to, this.clientId);
         }
 
         MessageCollection collection = super.listMessages(userId, to, recipientType, params);
@@ -192,4 +197,7 @@ public class CachedChatMessageComponent extends ChatMessageComponent {
         return false;
     }
 
+    public void close() {
+        messageRepository.close();
+    }
 }

@@ -17,9 +17,9 @@ public class ChatService {
     private ChatChannelComponent chatChannel;
     private ChatMessageComponent chatMessage;
 
-    public ChatService() {
-        this.chatChannel = new ChatChannelComponent();
-        this.chatMessage = new ChatMessageComponent();
+    public ChatService(ChatChannelComponent chatChannel, ChatMessageComponent chatMessage) {
+        this.chatChannel = chatChannel;
+        this.chatMessage = chatMessage;
     }
 
     public void sendMessage(String channelName, String message) throws InvalidComponentException, InvalidArgumentException {
@@ -88,7 +88,7 @@ public class ChatService {
                 }
             }
 
-            if (!channelCollection.getNextPageToken().isEmpty()) {
+            if (channelCollection.getNextPageToken() != null && !channelCollection.getNextPageToken().isEmpty()) {
                 return findByChannelName(channelName, channelCollection.getNextPageToken());
             }
         }
@@ -113,7 +113,7 @@ public class ChatService {
         if (collection.getMessages() != null) {
             messages.addAll(collection.getMessages());
 
-            if (!collection.getNextPageToken().isEmpty()) {
+            if (collection.getNextPageToken() != null && !collection.getNextPageToken().isEmpty()) {
                 getMessagesByDate(memberId, channelId, recipientType, date, collection.getNextPageToken(), messages);
             }
         }
@@ -132,7 +132,7 @@ public class ChatService {
         if (collection.getMembers() != null) {
             members.addAll(collection.getMembers());
 
-            if (!collection.getNextPageToken().isEmpty()) {
+            if (collection.getNextPageToken() != null && !collection.getNextPageToken().isEmpty()) {
                 getMembers(channelId, collection.getNextPageToken(), members);
             }
         }
