@@ -79,7 +79,7 @@ public class TokenHandler {
     public String getOAuthToken(String clientId, String clientSecret,
                                 String redirectUri) throws OAuthSystemException, OAuthProblemException, IOException {
 
-        Optional<CredentialEntity> optionalStoredCredentials = credentialRepository.findById(clientId);
+        Optional<CredentialEntity> optionalStoredCredentials = credentialRepository.findByClientId(clientId);
         if (optionalStoredCredentials.isPresent()) {
             CredentialEntity credentials = optionalStoredCredentials.get();
             if (DateUtil.minutesBetween(credentials.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC)) < TOKEN_EXPIRATION) {

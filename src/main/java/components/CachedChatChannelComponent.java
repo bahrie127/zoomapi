@@ -67,7 +67,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
 
     @Override
     public Channel getChannel(String channelId) throws InvalidComponentException {
-        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
+        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findByChannelIdAndClientId(channelId, this.clientId);
 
         if (optionalCachedEntity.isPresent()) {
             ChannelEntity cachedEntity = optionalCachedEntity.get();
@@ -87,13 +87,13 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
     @Override
     public void deleteChannel(String channelId) throws InvalidComponentException {
         super.deleteChannel(channelId);
-        this.channelRepository.remove(channelId);
+        this.channelRepository.removeByChannelIdAndClientId(channelId, this.clientId);
     }
 
     @Override
     public void updateChannel(String channelId, String name) throws InvalidComponentException {
         super.updateChannel(channelId, name);
-        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findById(channelId);
+        Optional<ChannelEntity> optionalCachedEntity = this.channelRepository.findByChannelIdAndClientId(channelId, this.clientId);
 
         if (optionalCachedEntity.isPresent()) {
             ChannelEntity cachedEntity = optionalCachedEntity.get();
@@ -130,12 +130,12 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
     @Override
     public void leaveChannel(String channelId) throws InvalidComponentException {
         super.leaveChannel(channelId);
-        this.channelRepository.remove(channelId);
+        this.channelRepository.removeByChannelIdAndClientId(channelId, this.clientId);
     }
 
     @Override
     public void removeMember(String channelId, String memberId) throws InvalidComponentException {
-        this.channelMemberRepository.remove(memberId);
+        this.channelMemberRepository.removeByMemberIdAndClientId(memberId, this.clientId);
         super.removeMember(channelId, memberId);
     }
 

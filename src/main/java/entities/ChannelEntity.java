@@ -12,6 +12,13 @@ public class ChannelEntity {
     @Column("id")
     private String id;
 
+    @PrimaryKey
+    @NotNull
+    @Size(22)
+    @Column("client_id")
+    @ForeignKey(CredentialEntity.class)
+    private String clientId;
+
     @NotNull
     @Column("name")
     private String name;
@@ -19,12 +26,6 @@ public class ChannelEntity {
     @NotNull
     @Column("type")
     private int type;
-
-    @NotNull
-    @Size(22)
-    @Column("client_id")
-    @ForeignKey(CredentialEntity.class)
-    private String clientId;
 
     @NotNull
     @Column("cached_date")

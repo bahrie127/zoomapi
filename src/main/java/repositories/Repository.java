@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Repository<T, K> {
+public class Repository<T> {
 
     private Connection connection = null;
     private Logger logger = Logger.getLogger(this.getClass().getName());
@@ -20,7 +20,6 @@ public class Repository<T, K> {
     private Field[] fields;
     private Class entityClass;
     private String tableName;
-    private String idFieldName;
 
     public Repository(Class<T> entityClass) throws InvalidEntityException {
 
@@ -113,29 +112,32 @@ public class Repository<T, K> {
         save(new ArrayList<>(Arrays.asList(entity)));
     }
 
-    public Optional<T> findById(K id) {
-        try {
-            connect();
-
-            StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM ");
-            sqlBuilder.append(this.tableName);
-            sqlBuilder.append(" WHERE ");
-            sqlBuilder.append(this.idFieldName);
-            sqlBuilder.append(" = ?;");
-
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
-            preparedStatement.setObject(1, id);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(entryToEntity(resultSet));
+    protected List<T> get(Map<String, Object> params) {
+        boolean firstEntry = true;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            if (firstEntry) {
+                firstEntry = false;
+            } else {
+                stringBuilder.append(" AND ");
             }
 
-        } catch (SQLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            logger.warning(exception.getMessage());
+            stringBuilder.append(entry.getKey());
+            stringBuilder.append(" = ");
+
+            String appendix = "";
+            if (entry.getValue().getClass() == String.class) {
+                stringBuilder.append("'");
+                appendix = "'";
+            }
+
+            stringBuilder.append(entry.getValue());
+            stringBuilder.append(appendix);
         }
 
-        return Optional.ofNullable(null);
+        stringBuilder.append(";");
+
+        return get(stringBuilder.toString());
     }
 
     protected List<T> get(String where) {
@@ -164,30 +166,6 @@ public class Repository<T, K> {
         }
 
         return results;
-    }
-
-    public List<T> findAll() {
-        return get(null);
-    }
-
-    public void remove(K id) {
-        try {
-            connect();
-
-            StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ");
-            sqlBuilder.append(this.tableName);
-            sqlBuilder.append(" WHERE ");
-            sqlBuilder.append(this.idFieldName);
-            sqlBuilder.append(" = ?;");
-
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlBuilder.toString());
-
-            preparedStatement.setObject(1, id);
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
-            logger.warning(exception.getMessage());
-        }
-
     }
 
     protected void removeByCondition(String condition) {
@@ -268,6 +246,7 @@ public class Repository<T, K> {
             StringBuilder sqlBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             sqlBuilder.append(this.tableName);
             sqlBuilder.append("(");
+            List<String> primaryKeys = new ArrayList<>();
             boolean firstField = true;
 
             for (Field field : this.fields) {
@@ -278,18 +257,32 @@ public class Repository<T, K> {
                 }
 
                 sqlBuilder.append(generateColumn(field));
+                if (field.isAnnotationPresent(PrimaryKey.class)) {
+                    primaryKeys.add(toSQLColumnName(field));
+                }
             }
 
-            sqlBuilder.append(");");
+            if (primaryKeys.isEmpty()) {
+                throw new InvalidEntityException("No primary keys present");
+            }
+
+            sqlBuilder.append(", PRIMARY KEY(");
+            for (int i = 0; i < primaryKeys.size(); i++) {
+                if (i > 0) {
+                    sqlBuilder.append(",");
+                }
+
+                sqlBuilder.append(primaryKeys.get(i));
+            }
+
+            sqlBuilder.append("));");
 
             Statement statement = connection.createStatement();
             statement.executeUpdate(sqlBuilder.toString());
+
+            logger.info("Created table " + this.tableName);
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-
-        if (idFieldName == null) {
-            throw new InvalidEntityException("Missing primary key.");
         }
     }
 
@@ -298,11 +291,6 @@ public class Repository<T, K> {
         StringBuilder columnBuilder = new StringBuilder(columnName);
 
         columnBuilder.append(" " + toSQLDataType(field));
-
-        if (field.isAnnotationPresent(PrimaryKey.class)) {
-            columnBuilder.append(" PRIMARY KEY");
-            this.idFieldName = columnName;
-        }
 
         if (field.isAnnotationPresent(NotNull.class)) {
             columnBuilder.append(" NOT NULL");

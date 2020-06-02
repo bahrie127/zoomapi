@@ -1,5 +1,6 @@
 package repositories;
 
+import entities.CredentialEntity;
 import entities.MessageEntity;
 import exceptions.InvalidEntityException;
 import util.DateUtil;
@@ -9,10 +10,33 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public class MessageRepository extends Repository<MessageEntity, String> {
+public class MessageRepository extends Repository<MessageEntity> {
     public MessageRepository() throws InvalidEntityException {
         super(MessageEntity.class);
+    }
+
+    public Optional<MessageEntity> findByMessageIdAndClientId(String messageId, String clientId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("message_id", messageId);
+        params.put("client_id", clientId);
+
+        List<MessageEntity> messages = get(params);
+
+        if (messages.size() > 0) {
+            return Optional.of(messages.get(0));
+        }
+
+        return Optional.ofNullable(null);
+    }
+
+    public void removeByMessageIdAndClientId(String messageId, String clientId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("message_id", messageId);
+        params.put("client_id", clientId);
+
+        removeByCondition(params);
     }
 
     public List<MessageEntity> getByDateAndClientIdAndChannelId(LocalDate localDate, String clientId, String channelId) {

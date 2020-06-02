@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 public class CachedChatMessageComponent extends ChatMessageComponent implements CachedComponent {
 
+    //UserComponent is used to get the current user for caching purposes, in the future will also be cached
     private UserComponent userComponent = new UserComponent();
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private MessageRepository messageRepository;
@@ -81,7 +82,7 @@ public class CachedChatMessageComponent extends ChatMessageComponent implements 
 
         super.putMessage(messageId, message, to, recipientType);
 
-        Optional<MessageEntity> optionalMessageEntity = messageRepository.findById(messageId);
+        Optional<MessageEntity> optionalMessageEntity = messageRepository.findByMessageIdAndClientId(messageId, this.clientId);
 
         if (optionalMessageEntity.isPresent()) {
             MessageEntity messageEntity = optionalMessageEntity.get();
@@ -97,7 +98,7 @@ public class CachedChatMessageComponent extends ChatMessageComponent implements 
     @Override
     public void deleteMessage(String messageId, String to, int recipientType) throws InvalidComponentException {
         super.deleteMessage(messageId, to, recipientType);
-        messageRepository.remove(messageId);
+        messageRepository.removeByMessageIdAndClientId(messageId, this.clientId);
     }
 
     private MessageCollection formCollection(List<MessageEntity> messages) {

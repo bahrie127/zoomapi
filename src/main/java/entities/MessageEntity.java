@@ -12,6 +12,13 @@ public class MessageEntity {
     @Column("id")
     private String id;
 
+    @PrimaryKey
+    @NotNull
+    @Size(22)
+    @Column("client_id")
+    @ForeignKey(CredentialEntity.class)
+    private String clientId;
+
     @NotNull
     @Column("message")
     private String message;
@@ -32,12 +39,6 @@ public class MessageEntity {
     @Size(36)
     @Column("channel_id")
     private String channelId;
-
-    @NotNull
-    @Size(22)
-    @Column("client_id")
-    @ForeignKey(CredentialEntity.class)
-    private String clientId;
 
     @NotNull
     @Column("cached_date")

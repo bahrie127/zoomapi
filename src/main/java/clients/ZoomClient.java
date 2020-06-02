@@ -59,6 +59,7 @@ public class ZoomClient {
     public void close() {
         this.chatChannels.close();
         this.chatMessages.close();
+        this.chatListener.unregisterEvents();
     }
 
     public String getApiKey() {
