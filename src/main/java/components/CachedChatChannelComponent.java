@@ -131,6 +131,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
     public void leaveChannel(String channelId) throws InvalidComponentException {
         super.leaveChannel(channelId);
         this.channelRepository.removeByIdAndClientId(channelId, this.clientId);
+        this.channelMemberRepository.removeByChannelIdAndClientId(channelId, this.clientId);
     }
 
     @Override
