@@ -28,9 +28,9 @@ public class ChannelMemberRepository extends Repository<ChannelMemberEntity> {
         removeByCondition(params);
     }
 
-    public void removeByMemberIdAndClientId(String memberId, String clientId) {
+    public void removeByIdAndClientId(String id, String clientId) {
         Map<String, Object> params = new HashMap<>();
-        params.put("member_id", memberId);
+        params.put("id", id);
         params.put("client_id", clientId);
 
         removeByCondition(params);

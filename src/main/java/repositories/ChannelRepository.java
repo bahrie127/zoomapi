@@ -14,9 +14,9 @@ public class ChannelRepository extends Repository<ChannelEntity> {
         super(ChannelEntity.class);
     }
 
-    public Optional<ChannelEntity> findByChannelIdAndClientId(String channelId, String clientId) {
+    public Optional<ChannelEntity> findByIdAndClientId(String id, String clientId) {
         Map<String, Object> params = new HashMap<>();
-        params.put("channel_id", channelId);
+        params.put("id", id);
         params.put("client_id", clientId);
 
         List<ChannelEntity> channels = get(params);
@@ -43,9 +43,9 @@ public class ChannelRepository extends Repository<ChannelEntity> {
         removeByCondition(params);
     }
 
-    public void removeByChannelIdAndClientId(String channelId, String clientId) {
+    public void removeByIdAndClientId(String id, String clientId) {
         Map<String, Object> params = new HashMap<>();
-        params.put("channel_id", channelId);
+        params.put("id", id);
         params.put("client_id", clientId);
 
         removeByCondition(params);

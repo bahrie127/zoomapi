@@ -280,7 +280,6 @@ public class Repository<T> {
             Statement statement = connection.createStatement();
             statement.executeUpdate(sqlBuilder.toString());
 
-            logger.info("Created table " + this.tableName);
         } catch (SQLException e) {
             e.printStackTrace();
         }
