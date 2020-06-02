@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-public class CachedChatMessageComponent extends ChatMessageComponent {
+public class CachedChatMessageComponent extends ChatMessageComponent implements CachedComponent {
 
     private UserComponent userComponent = new UserComponent();
     private Logger logger = Logger.getLogger(this.getClass().getName());

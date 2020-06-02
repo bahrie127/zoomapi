@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CachedChatChannelComponent extends ChatChannelComponent {
+public class CachedChatChannelComponent extends ChatChannelComponent implements CachedComponent {
 
     private ChannelRepository channelRepository;
     private ChannelMemberRepository channelMemberRepository = new ChannelMemberRepository();
@@ -125,19 +125,6 @@ public class CachedChatChannelComponent extends ChatChannelComponent {
 
         this.channelMemberRepository.save(entities);
         return channelMemberCollection;
-    }
-
-    //TODO: Need to figure out how to cache channel members when email is the only thing provided
-    @Override
-    public InvitedChannelMembers inviteMembers(String channelId, List<String> members) throws InvalidComponentException {
-        return super.inviteMembers(channelId, members);
-    }
-
-
-    // TODO: Need to figure out how to cache channel members when email is the only thing provided
-    @Override
-    public JoinedMember joinChannel(String channelId) throws InvalidComponentException {
-        return super.joinChannel(channelId);
     }
 
     @Override
