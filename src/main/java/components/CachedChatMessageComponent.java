@@ -70,7 +70,9 @@ public class CachedChatMessageComponent extends ChatMessageComponent implements 
         getUser();
 
         SentMessage sentMessage = super.postMessage(message, to, recipientType);
-        messageRepository.save(createEntity(sentMessage.getId(), message, to));
+        MessageEntity entity = createEntity(sentMessage.getId(), message, to);
+        entity.setRetrieved(false);
+        messageRepository.save(entity);
 
         return sentMessage;
     }
@@ -90,6 +92,7 @@ public class CachedChatMessageComponent extends ChatMessageComponent implements 
             LocalDateTime date = LocalDateTime.now(ZoneOffset.UTC);
             messageEntity.setMessage(message);
             messageEntity.setCachedDate(date);
+            messageEntity.setRetrieved(false);
             messageRepository.save(messageEntity);
         }
 
@@ -180,6 +183,7 @@ public class CachedChatMessageComponent extends ChatMessageComponent implements 
             entity.setCachedDate(LocalDateTime.now(ZoneOffset.UTC));
             entity.setChannelId(channelId);
             entity.setClientId(this.clientId);
+            entity.setRetrieved(true);
 
             entities.add(entity);
         }
@@ -188,14 +192,20 @@ public class CachedChatMessageComponent extends ChatMessageComponent implements 
     }
 
     private boolean hasExpired(List<MessageEntity> messageEntities) {
+        boolean result = true;
         for (MessageEntity messageEntity : messageEntities) {
             long timeDifference = DateUtil.minutesBetween(messageEntity.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC));
+
+            if (messageEntity.isRetrieved()) {
+                result = false;
+            }
+
             if (timeDifference > CACHE_INVALIDATION_TIME) {
                 return true;
             }
         }
 
-        return false;
+        return result;
     }
 
     public void close() {

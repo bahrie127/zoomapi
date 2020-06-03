@@ -91,8 +91,13 @@ public class Repository<T> {
                     field.setAccessible(true);
                     Object value = field.get(entity);
 
-                    if (value != null && value.getClass().equals(LocalDateTime.class)) {
-                        value = DateUtil.localDateTimeToString((LocalDateTime) value);
+                    if (value != null) {
+                        if (value.getClass().equals(LocalDateTime.class)) {
+                            value = DateUtil.localDateTimeToString((LocalDateTime) value);
+                        } else if (value.getClass().equals(Boolean.class)) {
+                            boolean bool = (boolean) value;
+                            value = bool ? 1 : 0;
+                        }
                     }
 
                     statement.setObject(i , value);
@@ -325,6 +330,8 @@ public class Repository<T> {
             return "INTEGER";
         } else if (type.equals(LocalDateTime.class)) {
             return "DATETIME";
+        } else if (type.equals(boolean.class)) {
+            return "BOOLEAN";
         }
 
         return "";
@@ -364,6 +371,9 @@ public class Repository<T> {
                 Object value = resultSet.getObject(fieldName);
                 if (field.getType().equals(LocalDateTime.class)) {
                     value = DateUtil.parseLocalDateTime((String) value);
+                } else if (field.getType().equals(boolean.class)) {
+                    int bool = (int) value;
+                    value = bool == 0 ? false : true;
                 }
 
                 field.set(entity, value);

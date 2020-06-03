@@ -46,7 +46,9 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
         List<ChannelEntity> entities = new ArrayList<>();
         if (channelCollection != null) {
             for (Channel channel : channelCollection.getChannels()) {
-                entities.add(modelToEntity(channel));
+                ChannelEntity entity = modelToEntity(channel);
+                entity.setRetrieved(true);
+                entities.add(entity);
             }
         }
 
@@ -59,6 +61,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
     public Channel createChannel(String name, int type, List<String> members) throws InvalidComponentException {
         Channel channel = super.createChannel(name, type, members);
         ChannelEntity channelEntity = modelToEntity(channel);
+        channelEntity.setRetrieved(false);
 
         this.channelRepository.save(channelEntity);
 
@@ -78,6 +81,7 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
 
         Channel channel = super.getChannel(channelId);
         ChannelEntity channelEntity = modelToEntity(channel);
+        channelEntity.setRetrieved(true);
 
         this.channelRepository.save(channelEntity);
 
@@ -99,6 +103,8 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
             ChannelEntity cachedEntity = optionalCachedEntity.get();
             cachedEntity.setName(name);
             cachedEntity.setCachedDate(LocalDateTime.now(ZoneOffset.UTC));
+            cachedEntity.setRetrieved(true);
+
             this.channelRepository.save(cachedEntity);
         }
     }
@@ -120,7 +126,9 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
 
         List<ChannelMemberEntity> entities = new ArrayList<>();
         for(ChannelMember member: channelMemberCollection.getMembers()) {
-            entities.add(memberModelToEntity(member, channelId));
+            ChannelMemberEntity entity = memberModelToEntity(member, channelId);
+            entity.setRetrieved(true);
+            entities.add(entity);
         }
 
         this.channelMemberRepository.save(entities);
@@ -190,27 +198,42 @@ public class CachedChatChannelComponent extends ChatChannelComponent implements 
     }
 
     private boolean hasCachedChannelsExpired(List<ChannelEntity> channelEntities) {
+        boolean result = true;
+
         for (ChannelEntity channelEntity : channelEntities) {
             long timeDifference = DateUtil.minutesBetween(channelEntity.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC));
 
+            if (channelEntity.isRetrieved()) {
+                result = false;
+            }
+
             if (timeDifference > CACHE_INVALIDATION_TIME) {
-                return true;
+                if (channelEntity.isRetrieved()) {
+                    return true;
+                }
             }
         }
 
-        return false;
+        return result;
     }
 
     private boolean hasCachedMembersExpired(List<ChannelMemberEntity> channelMemberEntities) {
+        boolean result = true;
         for (ChannelMemberEntity channelMemberEntity : channelMemberEntities) {
             long timeDifference = DateUtil.minutesBetween(channelMemberEntity.getCachedDate(), LocalDateTime.now(ZoneOffset.UTC));
 
+            if (channelMemberEntity.isRetrieved()) {
+                result = false;
+            }
+
             if (timeDifference > CACHE_INVALIDATION_TIME) {
-                return true;
+                if (channelMemberEntity.isRetrieved()) {
+                    return true;
+                }
             }
         }
 
-        return false;
+        return result;
     }
 
     private ChannelCollection formChannelCollection(List<ChannelEntity> channelEntities) {

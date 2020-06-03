@@ -44,6 +44,10 @@ public class ChannelMemberEntity {
     @Column("cached_date")
     private LocalDateTime cachedDate;
 
+    @NotNull
+    @Column("retrieved")
+    private boolean retrieved;
+
     public String getId() {
         return id;
     }
@@ -106,5 +110,13 @@ public class ChannelMemberEntity {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public boolean isRetrieved() {
+        return retrieved;
+    }
+
+    public void setRetrieved(boolean retrieved) {
+        this.retrieved = retrieved;
     }
 }

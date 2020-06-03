@@ -44,14 +44,14 @@ public class OAuthBot {
             params.put("page_size", 100);
 
             //Messages test
+            SentMessage message = client.getChatMessages().postMessage("pool2", "109ab13498c64fd5911a42be1076ea6b", 1);
             System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "109ab13498c64fd5911a42be1076ea6b", 1, params)));
-            //SentMessage message = client.getChatMessages().postMessage("pool2", "109ab13498c64fd5911a42be1076ea6b", 1);
 
             /*client.getChatMessages().putMessage(message.getId(), "edit", "109ab13498c64fd5911a42be1076ea6b", 1);
             client.getChatMessages().deleteMessage(message.getId(), "109ab13498c64fd5911a42be1076ea6b", 1);*/
 
             //Channels test
-            //Channel channel = client.getChatChannels().createChannel("testerchannel", 1, new ArrayList<>());
+            Channel channel = client.getChatChannels().createChannel("testerchannel", 1, new ArrayList<>());
             System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
             System.out.println(gson.toJson(client.getChatChannels().getChannel("109ab13498c64fd5911a42be1076ea6b")));
             /*Channel newChannel = client.getChatChannels().createChannel("lalala", 1, new ArrayList<>());
