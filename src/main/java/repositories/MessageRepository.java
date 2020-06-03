@@ -1,6 +1,5 @@
 package repositories;
 
-import entities.CredentialEntity;
 import entities.MessageEntity;
 import exceptions.InvalidEntityException;
 import util.DateUtil;

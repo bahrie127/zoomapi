@@ -1,10 +1,10 @@
 package components;
 
+import api.ApiClient;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptions.InvalidArgumentException;
-import api.ApiClient;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
 import models.Recording;

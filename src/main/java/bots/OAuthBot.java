@@ -2,19 +2,12 @@ package bots;
 
 import clients.OAuthClient;
 import com.google.gson.Gson;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import exceptions.InvalidArgumentException;
-import exceptions.InvalidComponentException;
-import exceptions.InvalidEntityException;
 import models.Channel;
 import models.SentMessage;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.ini4j.Wini;
 import xyz.dmanchon.ngrok.client.NgrokTunnel;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

@@ -4,7 +4,6 @@ import api.ApiClient;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import exceptions.InvalidArgumentException;
 import exceptions.InvalidComponentException;
 import exceptions.InvalidRequestException;
@@ -12,7 +11,6 @@ import models.AccountReportCollection;
 import models.MeetingReportCollection;
 import util.DateUtil;
 import util.Validator;
-
 
 import java.net.http.HttpResponse;
 import java.util.Date;
