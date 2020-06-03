@@ -17,9 +17,9 @@ public class MessageRepository extends Repository<MessageEntity> {
         super(MessageEntity.class);
     }
 
-    public Optional<MessageEntity> findByMessageIdAndClientId(String messageId, String clientId) {
+    public Optional<MessageEntity> findByMessageIdAndClientId(String id, String clientId) {
         Map<String, Object> params = new HashMap<>();
-        params.put("message_id", messageId);
+        params.put("id", id);
         params.put("client_id", clientId);
 
         List<MessageEntity> messages = get(params);
@@ -31,9 +31,9 @@ public class MessageRepository extends Repository<MessageEntity> {
         return Optional.ofNullable(null);
     }
 
-    public void removeByMessageIdAndClientId(String messageId, String clientId) {
+    public void removeByMessageIdAndClientId(String id, String clientId) {
         Map<String, Object> params = new HashMap<>();
-        params.put("message_id", messageId);
+        params.put("id", id);
         params.put("client_id", clientId);
 
         removeByCondition(params);

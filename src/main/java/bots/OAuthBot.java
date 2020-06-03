@@ -47,33 +47,23 @@ public class OAuthBot {
             SentMessage message = client.getChatMessages().postMessage("pool2", "109ab13498c64fd5911a42be1076ea6b", 1);
             System.out.println(gson.toJson(client.getChatMessages().listMessages("me", "109ab13498c64fd5911a42be1076ea6b", 1, params)));
 
-            /*client.getChatMessages().putMessage(message.getId(), "edit", "109ab13498c64fd5911a42be1076ea6b", 1);
-            client.getChatMessages().deleteMessage(message.getId(), "109ab13498c64fd5911a42be1076ea6b", 1);*/
+            client.getChatMessages().putMessage(message.getId(), "edit", "109ab13498c64fd5911a42be1076ea6b", 1);
+            client.getChatMessages().deleteMessage(message.getId(), "109ab13498c64fd5911a42be1076ea6b", 1);
 
             //Channels test
             Channel channel = client.getChatChannels().createChannel("testerchannel", 1, new ArrayList<>());
             System.out.println(gson.toJson(client.getChatChannels().listChannels(null)));
             System.out.println(gson.toJson(client.getChatChannels().getChannel("109ab13498c64fd5911a42be1076ea6b")));
-            /*Channel newChannel = client.getChatChannels().createChannel("lalala", 1, new ArrayList<>());
+            Channel newChannel = client.getChatChannels().createChannel("lalala", 1, new ArrayList<>());
             client.getChatChannels().updateChannel(newChannel.getId(), "lululu");
-            client.getChatChannels().deleteChannel(newChannel.getId());*/
+            client.getChatChannels().deleteChannel(newChannel.getId());
 
             //Members test
             System.out.println(gson.toJson(client.getChatChannels().listMembers("109ab13498c64fd5911a42be1076ea6b", null)));
-            //client.getChatChannels().inviteMembers("109ab13498c64fd5911a42be1076ea6b", new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
-            /*client.getChatChannels().leaveChannel(channel.getId());
-            System.out.println(gson.toJson(client.getChatChannels().listMembers(channel.getId(), null)));
-            client.getChatChannels().joinChannel(channel.getId());*/
+            client.getChatChannels().inviteMembers("109ab13498c64fd5911a42be1076ea6b", new ArrayList<>(Arrays.asList("nicalgrant@gmail.com")));
+            client.getChatChannels().leaveChannel(newChannel.getId());
+            client.getChatChannels().joinChannel(newChannel.getId());
 
-            /*client.getChatListener().onNewMessage("test", message -> {
-                System.out.println("new");
-                System.out.println(gson.toJson(message));
-            });
-
-            client.getChatListener().onMessageUpdate("test", message -> {
-                System.out.println("update");
-                System.out.println(gson.toJson(message));
-            });*/
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {
